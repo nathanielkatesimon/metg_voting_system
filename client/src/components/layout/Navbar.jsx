@@ -1,12 +1,17 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [logoutConfirm, setLogoutConfirm] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   async function handleLogout() {
+    setIsLoggingOut(true)
     await logout()
     navigate('/login', { replace: true })
   }
@@ -23,6 +28,7 @@ export default function Navbar() {
       ]
 
   return (
+    <>
     <header className="sticky top-0 z-40 border-b border-border bg-background">
       <div className="flex items-center justify-between h-14 px-4">
         <div className="flex items-center gap-5">
@@ -47,7 +53,7 @@ export default function Navbar() {
         </div>
         <div className="flex items-center gap-2">
           <span className="hidden sm:block text-sm text-muted-foreground">{user?.fullName}</span>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
+          <Button variant="ghost" size="sm" onClick={() => setLogoutConfirm(true)}>
             Logout
           </Button>
         </div>
@@ -71,5 +77,17 @@ export default function Navbar() {
         ))}
       </nav>
     </header>
+
+      {logoutConfirm && (
+        <ConfirmDialog
+          title="Log Out"
+          description="Are you sure you want to log out?"
+          confirmLabel="Log Out"
+          onConfirm={handleLogout}
+          onClose={() => setLogoutConfirm(false)}
+          isLoading={isLoggingOut}
+        />
+      )}
+    </>
   )
 }

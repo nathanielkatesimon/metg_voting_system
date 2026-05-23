@@ -19,6 +19,8 @@ export default function ElectionsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [actionLoading, setActionLoading] = useState(null)
+  const [openConfirm, setOpenConfirm] = useState(null)
+  const [closeConfirm, setCloseConfirm] = useState(null)
 
   useEffect(() => {
     fetchElections()
@@ -42,6 +44,7 @@ export default function ElectionsPage() {
     try {
       const updated = await openElection(election._id)
       setElections(prev => prev.map(e => e._id === updated._id ? updated : e))
+      setOpenConfirm(null)
       showSuccess(`"${election.title}" is now open for voting.`)
     } catch (err) {
       showError(err.response?.data?.message || 'Failed to open election.')
@@ -55,6 +58,7 @@ export default function ElectionsPage() {
     try {
       const updated = await closeElection(election._id)
       setElections(prev => prev.map(e => e._id === updated._id ? updated : e))
+      setCloseConfirm(null)
       showSuccess(`"${election.title}" has been closed.`)
     } catch (err) {
       showError(err.response?.data?.message || 'Failed to close election.')
@@ -153,10 +157,9 @@ export default function ElectionsPage() {
                           </Button>
                           <Button
                             size="sm"
-                            disabled={actionLoading === election._id + '-open'}
-                            onClick={() => handleOpen(election)}
+                            onClick={() => setOpenConfirm(election)}
                           >
-                            {actionLoading === election._id + '-open' ? 'Opening…' : 'Open'}
+                            Open
                           </Button>
                           <Button
                             variant="destructive"
@@ -171,10 +174,9 @@ export default function ElectionsPage() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          disabled={actionLoading === election._id + '-close'}
-                          onClick={() => handleClose(election)}
+                          onClick={() => setCloseConfirm(election)}
                         >
-                          {actionLoading === election._id + '-close' ? 'Closing…' : 'Close'}
+                          Close
                         </Button>
                       )}
                       {election.status === 'closed' && (
@@ -198,6 +200,29 @@ export default function ElectionsPage() {
           onConfirm={() => handleDelete(deleteConfirm)}
           onClose={() => setDeleteConfirm(null)}
           isLoading={isDeleting}
+        />
+      )}
+
+      {openConfirm && (
+        <ConfirmDialog
+          title="Open Election"
+          description={`Open "${openConfirm.title}" for voting? Voters will be able to cast their votes immediately.`}
+          confirmLabel="Open Election"
+          confirmVariant="default"
+          onConfirm={() => handleOpen(openConfirm)}
+          onClose={() => setOpenConfirm(null)}
+          isLoading={actionLoading === openConfirm._id + '-open'}
+        />
+      )}
+
+      {closeConfirm && (
+        <ConfirmDialog
+          title="Close Election"
+          description={`Close "${closeConfirm.title}"? Voting will stop immediately and this cannot be undone.`}
+          confirmLabel="Close Election"
+          onConfirm={() => handleClose(closeConfirm)}
+          onClose={() => setCloseConfirm(null)}
+          isLoading={actionLoading === closeConfirm._id + '-close'}
         />
       )}
     </div>

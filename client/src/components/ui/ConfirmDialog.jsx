@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 
-export default function ConfirmDialog({ title, description, confirmLabel = 'Delete', onConfirm, onClose, isLoading = false }) {
+export default function ConfirmDialog({ title, description, confirmLabel = 'Delete', confirmVariant = 'destructive', onConfirm, onClose, isLoading = false }) {
   const loadingLabel = confirmLabel === 'Delete' ? 'Deleting…' : `${confirmLabel}…`
 
   return (
@@ -12,7 +12,7 @@ export default function ConfirmDialog({ title, description, confirmLabel = 'Dele
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={isLoading}>
+          <Button variant={confirmVariant} onClick={onConfirm} disabled={isLoading}>
             {isLoading ? loadingLabel : confirmLabel}
           </Button>
         </div>

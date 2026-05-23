@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 const links = [
   { to: '/admin/elections', label: 'Elections' },
@@ -12,8 +13,11 @@ export default function AdminLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [logoutConfirm, setLogoutConfirm] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   async function handleLogout() {
+    setIsLoggingOut(true)
     await logout()
     navigate('/login', { replace: true })
   }
@@ -66,7 +70,7 @@ export default function AdminLayout() {
             variant="ghost"
             size="sm"
             className="w-full justify-start text-muted-foreground"
-            onClick={handleLogout}
+            onClick={() => setLogoutConfirm(true)}
           >
             Logout
           </Button>
@@ -95,6 +99,17 @@ export default function AdminLayout() {
           <Outlet />
         </main>
       </div>
+
+      {logoutConfirm && (
+        <ConfirmDialog
+          title="Log Out"
+          description="Are you sure you want to log out?"
+          confirmLabel="Log Out"
+          onConfirm={handleLogout}
+          onClose={() => setLogoutConfirm(false)}
+          isLoading={isLoggingOut}
+        />
+      )}
     </div>
   )
 }
