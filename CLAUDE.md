@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Election Management & E-Voting System — MERN stack, single developer, 7-day build.
+**Purok (community/neighborhood) Election Management & E-Voting System** — MERN stack, single developer, 7-day build.
+This is a local community voting system, not a school or student election platform. All terminology and UI copy must reflect that context.
 Full architecture review and 72-task backlog are in `project-plan.md`. Read it before starting any implementation work.
 
 ## Monorepo Layout
@@ -14,7 +15,7 @@ Full architecture review and 72-task backlog are in `project-plan.md`. Read it b
 /client      React / Vite frontend
 ```
 
-Neither directory exists yet. They are created in Tasks 1–2 and Task 6 respectively.
+Both directories exist (created in Tasks 1–2 and Task 6).
 
 ## Commands
 
@@ -51,7 +52,7 @@ No test runner is included in the spec. Manual test checklists are Tasks 68–71
 
 - **Entry:** `client/src/main.jsx` → `App.jsx` → React Router route tree.
 - **Auth flow:** `AuthContext` (`client/src/context/AuthContext.jsx`) calls `GET /api/auth/me` on mount to rehydrate session. All protected pages are wrapped in `PrivateRoute` or `AdminRoute` (`client/src/components/routing/`). Both guards wait for `isLoading` before redirecting to prevent flash.
-- **API calls:** All requests go through the shared Axios instance at `client/src/lib/axios.js` (`baseURL: '/api'`, `withCredentials: true`). A 401 interceptor redirects to `/login`. Service modules in `client/src/services/` wrap Axios calls per domain.
+- **API calls:** All requests go through the shared Axios instance at `client/src/lib/axios.js` (`baseURL: '/api'`, `withCredentials: true`). A 401 interceptor redirects to `/login` — but only when the current path is NOT in the public-path list (`/login`, `/register`). Without this guard, the `getMe()` probe on mount creates an infinite reload loop on the login page. Service modules in `client/src/services/` wrap Axios calls per domain.
 - **Layouts:** `AdminLayout` (sidebar) and `VoterLayout` (top navbar) wrap their respective route trees. Both import `Navbar` from `client/src/components/layout/`.
 - **UI:** shadcn/ui components live in `client/src/components/ui/`. Recharts is used only in the results dashboard (`client/src/components/results/`).
 
@@ -64,7 +65,7 @@ No test runner is included in the spec. Manual test checklists are Tasks 68–71
 
 ### Key schema decisions
 
-- `Users.studentId` — the human-readable external ID (student number, etc.). Sparse unique index. MongoDB `_id` is used as the system reference everywhere else.
+- `Users.voterId` — the human-readable external ID issued to each community voter (e.g. `VTR-2024-001`). Required, unique. Also the Passport `usernameField` — login uses `voterId` + password, not email. There is **no email field** on the User model.
 - `Elections.deletedAt` — soft delete. All election queries filter `{ deletedAt: null }`.
 - `Candidates.electionId` — denormalized from positionId for query convenience. Must be set from `position.electionId` at creation time.
 - `Elections.status` — enum `['upcoming', 'active', 'closed']`. Transitions are one-way only (`upcoming → active → closed`). No backward transitions are allowed; the close route enforces this.
