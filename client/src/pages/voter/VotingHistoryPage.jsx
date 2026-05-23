@@ -39,7 +39,11 @@ export default function VotingHistoryPage() {
 
   if (isLoading) return (
     <div className="px-4 py-8 space-y-8 max-w-2xl mx-auto">
-      <Skeleton className="h-7 w-48" />
+      <div className="rounded-2xl border border-border bg-muted/30 px-6 py-8 space-y-3">
+        <Skeleton className="h-3 w-28" />
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-64" />
+      </div>
       <div className="space-y-3">
         {[1, 2, 3].map(i => (
           <div key={i} className="rounded-xl border border-border overflow-hidden">
@@ -55,6 +59,7 @@ export default function VotingHistoryPage() {
       </div>
     </div>
   )
+
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   if (selected) {
@@ -70,17 +75,26 @@ export default function VotingHistoryPage() {
     return (
       <div className="px-4 py-8 space-y-10 max-w-3xl mx-auto">
         <div>
-          <Button variant="ghost" size="sm" className="-ml-2 mb-3" onClick={() => setSelected(null)}>
-            ← Back to History
+          <Button variant="ghost" size="sm" className="-ml-2 mb-4" onClick={() => setSelected(null)}>
+            <i className="bx bx-arrow-back mr-1 text-base" /> Back to History
           </Button>
-          <div className="flex items-start gap-3">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold">{election.title}</h1>
-              {election.description && (
-                <p className="text-sm text-muted-foreground">{election.description}</p>
-              )}
+          <div className="rounded-2xl border border-border bg-muted/30 px-6 py-6 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-widest text-primary">Election Detail</p>
+                <h1 className="text-2xl font-bold">{election.title}</h1>
+                {election.description && (
+                  <p className="text-sm text-muted-foreground">{election.description}</p>
+                )}
+              </div>
+              <ElectionStatusBadge status={election.status} />
             </div>
-            <ElectionStatusBadge status={election.status} />
+            <div className="flex items-center gap-4 pt-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <i className="bx bx-check-circle text-green-500 text-base" />
+                {votes.length} position{votes.length !== 1 ? 's' : ''} voted
+              </span>
+            </div>
           </div>
         </div>
 
@@ -108,7 +122,10 @@ export default function VotingHistoryPage() {
         {detail && (
           <>
             <section className="space-y-4">
-              <h2 className="text-lg font-semibold">Results</h2>
+              <h2 className="flex items-center gap-2 text-base font-semibold">
+                <i className="bx bx-bar-chart-alt-2 text-primary text-lg" />
+                Results
+              </h2>
               {detail.results.length === 0 ? (
                 <div className="rounded-xl border border-border px-6 py-8 text-center text-sm text-muted-foreground">
                   No results available.
@@ -127,7 +144,8 @@ export default function VotingHistoryPage() {
                         {pos.candidates.slice(0, pos.seats).filter(c => c.voteCount > 0).map((c, i) => (
                           <div key={c.candidateId} className="flex items-center justify-between px-4 py-2.5">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-muted-foreground w-4">{i + 1}.</span>
+                              {i === 0 && <i className="bx bxs-medal text-amber-500 text-sm" />}
+                              {i > 0 && <span className="text-xs text-muted-foreground w-4">{i + 1}.</span>}
                               <span className="text-sm font-medium">{c.name}</span>
                               {c.party && <span className="text-xs text-muted-foreground">· {c.party}</span>}
                             </div>
@@ -145,7 +163,10 @@ export default function VotingHistoryPage() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="text-lg font-semibold">Your Votes</h2>
+              <h2 className="flex items-center gap-2 text-base font-semibold">
+                <i className="bx bx-user-check text-primary text-lg" />
+                Your Votes
+              </h2>
               <div className="space-y-6">
                 {detail.results.map(pos => {
                   const candidates = detail.allCandidates.filter(
@@ -164,12 +185,12 @@ export default function VotingHistoryPage() {
                           )}
                         </div>
                         {myVoted.length > 0 ? (
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">
-                            Voted
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">
+                            <i className="bx bx-check text-sm" /> Voted
                           </span>
                         ) : (
-                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground">
-                            Not voted
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground">
+                            <i className="bx bx-minus text-sm" /> Not voted
                           </span>
                         )}
                       </div>
@@ -218,39 +239,61 @@ export default function VotingHistoryPage() {
 
   return (
     <div className="px-4 py-8 space-y-8 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold">My Voting History</h1>
 
-      {history.length === 0 ? (
-        <div className="rounded-xl border border-border px-6 py-10 text-center text-sm text-muted-foreground">
-          You haven't voted in any elections yet.
+      {/* Hero */}
+      <div className="rounded-2xl border border-border bg-muted/30 px-6 py-8 space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">Voting Record</p>
+        <h1 className="text-2xl font-bold">My Voting History</h1>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          A record of every election you've participated in. Select one to view results and your ballot.
+        </p>
+        <div className="pt-2 flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs font-medium">
+            <i className="bx bx-list-check text-primary text-sm" />
+            {history.length} election{history.length !== 1 ? 's' : ''} participated
+          </span>
         </div>
-      ) : (
-        <div className="space-y-3">
-          {history.map(({ election, votes }) => (
-            <button
-              key={election._id}
-              onClick={() => setSelected({ election, votes })}
-              className="w-full text-left rounded-xl border border-border overflow-hidden hover:bg-muted/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <div className="px-5 py-4 flex items-center justify-between gap-4">
-                <div className="space-y-1 min-w-0">
-                  <p className="font-semibold truncate">{election.title}</p>
-                  {election.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-1">{election.description}</p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    {votes.length} position{votes.length !== 1 ? 's' : ''} voted
-                  </p>
+      </div>
+
+      {/* List */}
+      <div className="space-y-3">
+        <h2 className="text-base font-semibold">Past Elections</h2>
+
+        {history.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border px-6 py-14 text-center space-y-2">
+            <i className="bx bx-box-open text-3xl text-muted-foreground" />
+            <p className="text-sm font-medium">No voting history yet</p>
+            <p className="text-xs text-muted-foreground">Elections you've voted in will appear here.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {history.map(({ election, votes }) => (
+              <button
+                key={election._id}
+                onClick={() => setSelected({ election, votes })}
+                className="w-full text-left rounded-xl border border-border overflow-hidden hover:bg-muted/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="px-5 py-4 flex items-center justify-between gap-4">
+                  <div className="space-y-1 min-w-0">
+                    <p className="font-semibold truncate">{election.title}</p>
+                    {election.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-1">{election.description}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <i className="bx bx-check-circle text-green-500 text-sm" />
+                      {votes.length} position{votes.length !== 1 ? 's' : ''} voted
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <ElectionStatusBadge status={election.status} />
+                    <i className="bx bx-chevron-right text-muted-foreground text-xl" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <ElectionStatusBadge status={election.status} />
-                  <span className="text-muted-foreground">›</span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

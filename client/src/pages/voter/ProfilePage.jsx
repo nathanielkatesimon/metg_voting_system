@@ -139,19 +139,66 @@ export default function ProfilePage() {
   const { user } = useAuth()
   const [currentUser, setCurrentUser] = useState(user)
 
+  const initials = currentUser.fullName
+    ? currentUser.fullName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : currentUser.voterId.slice(0, 2).toUpperCase()
+
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
-      <h1 className="text-2xl font-bold">My Profile</h1>
 
+      {/* Hero */}
+      <div className="rounded-2xl border border-border bg-muted/30 px-6 py-8 flex items-center gap-5">
+        <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold shrink-0 select-none">
+          {initials}
+        </div>
+        <div className="min-w-0 space-y-0.5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">My Account</p>
+          <h1 className="text-xl font-bold truncate">{currentUser.fullName || 'Community Voter'}</h1>
+          <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+            <i className="bx bx-id-card text-base" />
+            {currentUser.voterId}
+          </p>
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5 capitalize">
+            <i className="bx bx-shield text-sm" />
+            {currentUser.role}
+          </p>
+        </div>
+      </div>
+
+      {/* Info tiles */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-border p-4 space-y-1">
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <i className="bx bx-user text-sm" /> Full Name
+          </p>
+          <p className="text-sm font-medium truncate">{currentUser.fullName || '—'}</p>
+        </div>
+        <div className="rounded-xl border border-border p-4 space-y-1">
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <i className="bx bx-id-card text-sm" /> Voter ID
+          </p>
+          <p className="text-sm font-medium font-mono truncate">{currentUser.voterId}</p>
+        </div>
+      </div>
+
+      {/* Personal info form */}
       <section className="rounded-xl border border-border p-6 space-y-4">
-        <h2 className="text-base font-semibold">Personal Information</h2>
+        <h2 className="flex items-center gap-2 text-base font-semibold">
+          <i className="bx bx-edit-alt text-primary text-lg" />
+          Personal Information
+        </h2>
         <ProfileForm user={currentUser} onUpdated={setCurrentUser} />
       </section>
 
+      {/* Change password form */}
       <section className="rounded-xl border border-border p-6 space-y-4">
-        <h2 className="text-base font-semibold">Change Password</h2>
+        <h2 className="flex items-center gap-2 text-base font-semibold">
+          <i className="bx bx-lock-alt text-primary text-lg" />
+          Change Password
+        </h2>
         <PasswordForm />
       </section>
+
     </div>
   )
 }
