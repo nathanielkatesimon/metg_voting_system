@@ -6,7 +6,10 @@ import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 import UnauthorizedPage from '@/pages/UnauthorizedPage'
 import ProfilePage from '@/pages/voter/ProfilePage'
+import VoterElectionsPage from '@/pages/voter/ElectionsPage'
 import UsersPage from '@/pages/admin/UsersPage'
+import AdminElectionsPage from '@/pages/admin/ElectionsPage'
+import ElectionFormPage from '@/pages/admin/ElectionFormPage'
 
 function RootRedirect() {
   const { user, isLoading } = useAuth()
@@ -24,11 +27,16 @@ function App() {
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       {/* Voter routes */}
-      <Route path="/elections" element={<PrivateRoute><div>Elections (coming soon)</div></PrivateRoute>} />
+      <Route path="/elections" element={<PrivateRoute><VoterElectionsPage /></PrivateRoute>} />
+      <Route path="/elections/:id/vote" element={<PrivateRoute><div>Ballot (coming soon)</div></PrivateRoute>} />
       <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
 
       {/* Admin routes */}
-      <Route path="/admin/elections" element={<AdminRoute><div>Admin Elections (coming soon)</div></AdminRoute>} />
+      <Route path="/admin/elections" element={<AdminRoute><AdminElectionsPage /></AdminRoute>} />
+      <Route path="/admin/elections/new" element={<AdminRoute><ElectionFormPage /></AdminRoute>} />
+      <Route path="/admin/elections/:id/edit" element={<AdminRoute><ElectionFormPage /></AdminRoute>} />
+      <Route path="/admin/elections/:id" element={<AdminRoute><div>Election Detail (coming soon)</div></AdminRoute>} />
+      <Route path="/admin/elections/:id/results" element={<AdminRoute><div>Results (coming soon)</div></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
     </Routes>
   )

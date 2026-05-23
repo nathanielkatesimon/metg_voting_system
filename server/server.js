@@ -11,6 +11,8 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const adminUserRoutes = require('./routes/admin/users');
+const adminElectionRoutes = require('./routes/admin/elections');
+const electionRoutes = require('./routes/elections');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -50,6 +52,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/admin/elections', adminElectionRoutes);
+app.use('/api/elections', electionRoutes);
 
 app.use(errorHandler);
 
