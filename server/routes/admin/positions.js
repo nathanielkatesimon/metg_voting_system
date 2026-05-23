@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Position = require('../../models/Position');
 const Election = require('../../models/Election');
+const Vote = require('../../models/Vote');
 const { requireAdmin } = require('../../middleware/auth');
 
 router.use(requireAdmin);
@@ -52,7 +53,10 @@ router.delete('/positions/:id', async (req, res, next) => {
     const position = await Position.findById(req.params.id);
     if (!position) return res.status(404).json({ message: 'Position not found.' });
 
-    // Vote check will be added here in Phase 7 once Vote model exists.
+    const hasVotes = await Vote.exists({ positionId: req.params.id });
+    if (hasVotes) {
+      return res.status(400).json({ message: 'Cannot delete a position that has votes cast.' });
+    }
 
     await position.deleteOne();
     res.json({ message: 'Position deleted.' });

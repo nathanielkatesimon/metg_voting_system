@@ -18,6 +18,7 @@ const adminCandidateRoutes = require('./routes/admin/candidates');
 const electionRoutes = require('./routes/elections');
 const positionRoutes = require('./routes/positions');
 const candidateRoutes = require('./routes/candidates');
+const voteRoutes = require('./routes/votes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -65,6 +66,7 @@ app.use('/api/admin/candidates', adminCandidateRoutes);
 app.use('/api/elections', electionRoutes);
 app.use('/api/elections', positionRoutes);
 app.use('/api/elections', candidateRoutes);
+app.use('/api', voteRoutes);
 
 app.use(errorHandler);
 

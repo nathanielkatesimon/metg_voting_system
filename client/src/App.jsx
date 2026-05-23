@@ -11,6 +11,8 @@ import UsersPage from '@/pages/admin/UsersPage'
 import AdminElectionsPage from '@/pages/admin/ElectionsPage'
 import ElectionFormPage from '@/pages/admin/ElectionFormPage'
 import ElectionDetailPage from '@/pages/admin/ElectionDetailPage'
+import BallotPage from '@/pages/voter/BallotPage'
+import VotingHistoryPage from '@/pages/voter/VotingHistoryPage'
 
 function RootRedirect() {
   const { user, isLoading } = useAuth()
@@ -29,7 +31,8 @@ function App() {
 
       {/* Voter routes */}
       <Route path="/elections" element={<PrivateRoute><VoterElectionsPage /></PrivateRoute>} />
-      <Route path="/elections/:id/vote" element={<PrivateRoute><div>Ballot (coming soon)</div></PrivateRoute>} />
+      <Route path="/elections/:id/vote" element={<PrivateRoute><BallotPage /></PrivateRoute>} />
+      <Route path="/history" element={<PrivateRoute><VotingHistoryPage /></PrivateRoute>} />
       <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
 
       {/* Admin routes */}
