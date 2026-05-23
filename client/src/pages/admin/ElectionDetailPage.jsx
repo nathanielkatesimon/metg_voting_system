@@ -8,7 +8,7 @@ import PositionFormModal from '@/components/positions/PositionFormModal'
 import CandidateCard from '@/components/candidates/CandidateCard'
 import CandidateFormModal from '@/components/candidates/CandidateFormModal'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 import { showSuccess, showError } from '@/lib/toast'
 
@@ -85,7 +85,50 @@ export default function ElectionDetailPage() {
     }
   }
 
-  if (isLoading) return <LoadingSpinner />
+  if (isLoading) return (
+    <div className="px-4 py-8 space-y-8 max-w-4xl">
+      <div>
+        <Skeleton className="h-8 w-20 mb-2" />
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-64" />
+            <Skeleton className="h-4 w-80" />
+          </div>
+          <Skeleton className="h-5 w-20 rounded-full" />
+        </div>
+      </div>
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-8 w-28" />
+        </div>
+        <div className="space-y-6">
+          {[1, 2].map(i => (
+            <div key={i} className="rounded-xl border border-border overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 bg-muted/60 border-b border-border">
+                <Skeleton className="h-5 w-40" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 w-14" />
+                  <Skeleton className="h-8 w-14" />
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {[1, 2, 3].map(j => (
+                    <div key={j} className="rounded-xl border border-border p-3 space-y-2">
+                      <Skeleton className="h-20 w-full rounded-lg" />
+                      <Skeleton className="h-4 w-3/4 mx-auto" />
+                      <Skeleton className="h-3 w-1/2 mx-auto" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   const canEdit = election.status !== 'closed'

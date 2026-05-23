@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getElections } from '@/services/electionService'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 
 export default function VoterElectionsPage() {
@@ -16,7 +16,23 @@ export default function VoterElectionsPage() {
       .finally(() => setIsLoading(false))
   }, [])
 
-  if (isLoading) return <LoadingSpinner />
+  if (isLoading) return (
+    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-44" />
+        <Skeleton className="h-4 w-60" />
+      </div>
+      <div className="space-y-4">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="rounded-xl border border-border p-6 space-y-3">
+            <Skeleton className="h-5 w-3/5" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-9 w-24" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">

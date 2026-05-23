@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { getAdminElections, deleteElection, openElection, closeElection } from '@/services/electionService'
 import ElectionStatusBadge from '@/components/elections/ElectionStatusBadge'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 import { showSuccess, showError } from '@/lib/toast'
 
@@ -92,7 +92,30 @@ export default function ElectionsPage() {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {isLoading ? (
-        <LoadingSpinner />
+        <div className="rounded-xl border border-border overflow-x-auto">
+          <table className="w-full text-sm min-w-[640px]">
+            <thead className="bg-muted text-muted-foreground">
+              <tr>
+                <th className="text-left px-4 py-3 font-medium">Title</th>
+                <th className="text-left px-4 py-3 font-medium">Status</th>
+                <th className="text-left px-4 py-3 font-medium">Start Date</th>
+                <th className="text-left px-4 py-3 font-medium">End Date</th>
+                <th className="px-4 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {[1, 2, 3, 4].map(i => (
+                <tr key={i}>
+                  <td className="px-4 py-3"><Skeleton className="h-4 w-48" /></td>
+                  <td className="px-4 py-3"><Skeleton className="h-5 w-16 rounded-full" /></td>
+                  <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+                  <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+                  <td className="px-4 py-3"><Skeleton className="h-8 w-20 ml-auto" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : elections.length === 0 ? (
         <div className="rounded-xl border border-border px-6 py-12 text-center text-sm text-muted-foreground">
           No elections yet. Create one to get started.

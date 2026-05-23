@@ -4,7 +4,7 @@ import { getResults } from '@/services/resultsService'
 import { getCandidates } from '@/services/candidateService'
 import CandidateCard from '@/components/candidates/CandidateCard'
 import ElectionStatusBadge from '@/components/elections/ElectionStatusBadge'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 
 export default function VotingHistoryPage() {
@@ -37,7 +37,24 @@ export default function VotingHistoryPage() {
       .finally(() => setDetailLoading(false))
   }, [selected])
 
-  if (isLoading) return <LoadingSpinner />
+  if (isLoading) return (
+    <div className="px-4 py-8 space-y-8 max-w-2xl mx-auto">
+      <Skeleton className="h-7 w-48" />
+      <div className="space-y-3">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="rounded-xl border border-border overflow-hidden">
+            <div className="px-5 py-4 flex items-center justify-between gap-4">
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-5 w-16 rounded-full shrink-0" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   if (selected) {
@@ -67,7 +84,25 @@ export default function VotingHistoryPage() {
           </div>
         </div>
 
-        {detailLoading && <LoadingSpinner />}
+        {detailLoading && (
+          <div className="space-y-6">
+            {[1, 2].map(i => (
+              <div key={i} className="rounded-xl border border-border overflow-hidden">
+                <div className="px-4 py-3 bg-muted/60 border-b border-border">
+                  <Skeleton className="h-5 w-40" />
+                </div>
+                <div className="divide-y divide-border">
+                  {[1, 2, 3].map(j => (
+                    <div key={j} className="flex items-center justify-between px-4 py-2.5">
+                      <Skeleton className="h-4 w-36" />
+                      <Skeleton className="h-3 w-12" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         {detailError && <div className="text-sm text-destructive">{detailError}</div>}
 
         {detail && (

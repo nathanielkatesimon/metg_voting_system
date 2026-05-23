@@ -5,7 +5,7 @@ import { getResults, getStats } from '@/services/resultsService'
 import ParticipationStatsCards from '@/components/results/ParticipationStatsCards'
 import VoteBarChart from '@/components/results/VoteBarChart'
 import CandidateRankingTable from '@/components/results/CandidateRankingTable'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 
 export default function ResultsPage() {
@@ -27,7 +27,48 @@ export default function ResultsPage() {
       .finally(() => setIsLoading(false))
   }, [id])
 
-  if (isLoading) return <LoadingSpinner />
+  if (isLoading) return (
+    <div className="px-4 py-8 space-y-8 max-w-4xl">
+      <div>
+        <Skeleton className="h-8 w-40 mb-2" />
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-80" />
+            <Skeleton className="h-4 w-60" />
+          </div>
+          <Skeleton className="h-8 w-28" />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="rounded-xl border border-border p-4 space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-7 w-16" />
+          </div>
+        ))}
+      </div>
+      <div className="space-y-8">
+        {[1, 2].map(i => (
+          <div key={i} className="rounded-xl border border-border overflow-hidden">
+            <div className="px-4 py-3 bg-muted/60 border-b border-border">
+              <Skeleton className="h-5 w-40" />
+            </div>
+            <div className="p-4 space-y-4">
+              <Skeleton className="h-40 w-full" />
+              <div className="space-y-2">
+                {[1, 2, 3].map(j => (
+                  <div key={j} className="flex items-center justify-between py-1">
+                    <Skeleton className="h-4 w-36" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   const totalVotes = results.reduce(

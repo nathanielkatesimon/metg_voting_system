@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getElection, createElection, updateElection } from '@/services/electionService'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 
 function toDateInputValue(dateStr) {
@@ -59,7 +59,38 @@ export default function ElectionFormPage() {
     }
   }
 
-  if (isLoading) return <LoadingSpinner />
+  if (isLoading) return (
+    <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-8 w-16" />
+        <Skeleton className="h-7 w-36" />
+      </div>
+      <div className="rounded-xl border border-border p-6 space-y-4">
+        <div className="space-y-1">
+          <Skeleton className="h-4 w-10" />
+          <Skeleton className="h-9 w-full" />
+        </div>
+        <div className="space-y-1">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+          <div className="space-y-1">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+        </div>
+        <div className="flex gap-2 justify-end pt-2">
+          <Skeleton className="h-9 w-20" />
+          <Skeleton className="h-9 w-32" />
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">

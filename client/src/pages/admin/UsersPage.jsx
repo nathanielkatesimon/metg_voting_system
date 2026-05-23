@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getAdminUsers, deleteAdminUser } from '@/services/userService'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 import { showSuccess, showError } from '@/lib/toast'
 
@@ -73,7 +73,28 @@ export default function UsersPage() {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {isLoading ? (
-        <LoadingSpinner />
+        <div className="rounded-xl border border-border overflow-x-auto">
+          <table className="w-full text-sm min-w-[480px]">
+            <thead className="bg-muted text-muted-foreground">
+              <tr>
+                <th className="text-left px-4 py-3 font-medium">Full Name</th>
+                <th className="text-left px-4 py-3 font-medium">Voter ID</th>
+                <th className="text-left px-4 py-3 font-medium">Role</th>
+                <th className="px-4 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <tr key={i}>
+                  <td className="px-4 py-3"><Skeleton className="h-4 w-36" /></td>
+                  <td className="px-4 py-3"><Skeleton className="h-4 w-28" /></td>
+                  <td className="px-4 py-3"><Skeleton className="h-4 w-12" /></td>
+                  <td className="px-4 py-3 text-right"><Skeleton className="h-8 w-16 ml-auto" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <>
           <div className="rounded-xl border border-border overflow-x-auto">

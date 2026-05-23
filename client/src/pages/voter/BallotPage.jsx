@@ -5,7 +5,7 @@ import { getPositions } from '@/services/positionService'
 import { getCandidates } from '@/services/candidateService'
 import { getMyVotes } from '@/services/voteService'
 import BallotPosition from '@/components/voting/BallotPosition'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export default function BallotPage() {
   const { id } = useParams()
@@ -51,7 +51,35 @@ export default function BallotPage() {
     }))
   }
 
-  if (isLoading) return <LoadingSpinner />
+  if (isLoading) return (
+    <div className="px-4 py-8 space-y-8 max-w-3xl mx-auto">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-2/3" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-4 w-32" />
+      </div>
+      <div className="space-y-6">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="rounded-xl border border-border overflow-hidden">
+            <div className="px-4 py-3 bg-muted/60 border-b border-border">
+              <Skeleton className="h-5 w-40" />
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {[1, 2, 3, 4].map(j => (
+                  <div key={j} className="rounded-xl border border-border p-3 space-y-2">
+                    <Skeleton className="h-20 w-full rounded-lg" />
+                    <Skeleton className="h-4 w-3/4 mx-auto" />
+                    <Skeleton className="h-3 w-1/2 mx-auto" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   const votedCount = positions.filter(p => (votedMap[p._id] || []).length >= p.seats).length
