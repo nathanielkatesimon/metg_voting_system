@@ -61,9 +61,11 @@ export default function ElectionFormPage() {
 
   if (isLoading) return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center gap-4">
-        <Skeleton className="h-8 w-16" />
-        <Skeleton className="h-7 w-36" />
+      <Skeleton className="h-8 w-24" />
+      <div className="rounded-2xl border border-border bg-muted/30 px-6 py-6 space-y-2">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-64" />
       </div>
       <div className="rounded-xl border border-border p-6 space-y-4">
         <div className="space-y-1">
@@ -94,11 +96,27 @@ export default function ElectionFormPage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/admin/elections">← Back</Link>
-        </Button>
-        <h1 className="text-2xl font-bold">{isEdit ? 'Edit Election' : 'New Election'}</h1>
+
+      <Button variant="ghost" size="sm" asChild className="-ml-2">
+        <Link to="/admin/elections">
+          <i className="bx bx-arrow-back mr-1 text-base" /> Elections
+        </Link>
+      </Button>
+
+      {/* Hero */}
+      <div className="rounded-2xl border border-border bg-muted/30 px-6 py-6 space-y-1">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+          {isEdit ? 'Edit Election' : 'New Election'}
+        </p>
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <i className={`bx ${isEdit ? 'bx-edit' : 'bx-calendar-plus'} text-primary`} />
+          {isEdit ? 'Edit Election' : 'Create Election'}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {isEdit
+            ? 'Update the details of this election. Only upcoming elections can be edited.'
+            : 'Fill in the details below to create a new community election.'}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="rounded-xl border border-border p-6 space-y-4">
@@ -130,7 +148,9 @@ export default function ElectionFormPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-sm font-medium" htmlFor="startDate">Start Date</label>
+            <label className="text-sm font-medium flex items-center gap-1" htmlFor="startDate">
+              <i className="bx bx-calendar text-muted-foreground text-sm" /> Start Date
+            </label>
             <input
               id="startDate"
               name="startDate"
@@ -141,7 +161,9 @@ export default function ElectionFormPage() {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium" htmlFor="endDate">End Date</label>
+            <label className="text-sm font-medium flex items-center gap-1" htmlFor="endDate">
+              <i className="bx bx-calendar-check text-muted-foreground text-sm" /> End Date
+            </label>
             <input
               id="endDate"
               name="endDate"
@@ -160,7 +182,13 @@ export default function ElectionFormPage() {
             <Link to="/admin/elections">Cancel</Link>
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Election'}
+            {isSubmitting ? (
+              'Saving…'
+            ) : isEdit ? (
+              <><i className="bx bx-save mr-1 text-base" /> Save Changes</>
+            ) : (
+              <><i className="bx bx-calendar-plus mr-1 text-base" /> Create Election</>
+            )}
           </Button>
         </div>
       </form>

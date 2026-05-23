@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 const links = [
-  { to: '/admin/elections', label: 'Elections' },
-  { to: '/admin/users', label: 'Voters' },
+  { to: '/admin/elections', label: 'Elections', icon: 'bx-calendar' },
+  { to: '/admin/users', label: 'Voters', icon: 'bx-group' },
 ]
 
 export default function AdminLayout() {
@@ -41,38 +41,43 @@ export default function AdminLayout() {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
         ].join(' ')}
       >
-        <div className="flex items-center h-14 px-4 border-b border-border shrink-0">
+        <div className="flex items-center h-14 px-4 border-b border-border shrink-0 gap-2">
+          <i className="bx bx-vote text-primary text-xl" />
           <span className="font-bold text-sm">Purok Elections</span>
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {links.map(({ to, label }) => (
+          {links.map(({ to, label, icon }) => (
             <NavLink
               key={to}
               to={to}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center px-3 py-2 rounded-md text-sm transition-colors ${
+                `flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
                   isActive
                     ? 'bg-muted font-medium text-foreground'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 }`
               }
             >
+              <i className={`bx ${icon} text-base`} />
               {label}
             </NavLink>
           ))}
         </nav>
 
         <div className="p-3 border-t border-border space-y-1 shrink-0">
-          <p className="px-3 py-1 text-xs text-muted-foreground truncate">{user?.fullName}</p>
+          <p className="px-3 py-1 text-xs text-muted-foreground truncate flex items-center gap-1.5">
+            <i className="bx bx-user text-sm shrink-0" />
+            {user?.fullName}
+          </p>
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start text-muted-foreground"
+            className="w-full justify-start text-muted-foreground gap-2"
             onClick={() => setLogoutConfirm(true)}
           >
-            Logout
+            <i className="bx bx-log-out text-base" /> Logout
           </Button>
         </div>
       </aside>
@@ -83,15 +88,12 @@ export default function AdminLayout() {
         <div className="flex items-center h-14 px-4 border-b border-border sm:hidden shrink-0">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-md hover:bg-muted mr-3"
+            className="p-2 rounded-md hover:bg-muted mr-2"
             aria-label="Open menu"
           >
-            <div className="w-5 space-y-1">
-              <span className="block h-0.5 bg-foreground rounded" />
-              <span className="block h-0.5 bg-foreground rounded" />
-              <span className="block h-0.5 bg-foreground rounded" />
-            </div>
+            <i className="bx bx-menu text-xl" />
           </button>
+          <i className="bx bx-vote text-primary text-xl mr-1" />
           <span className="font-bold text-sm">Purok Elections</span>
         </div>
 

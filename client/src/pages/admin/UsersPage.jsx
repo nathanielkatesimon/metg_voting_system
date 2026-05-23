@@ -55,19 +55,32 @@ export default function UsersPage() {
   )
 
   return (
-    <div className="px-4 py-8 space-y-6">
+    <div className="px-6 py-8 space-y-6">
+
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold">Registered Voters</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">View and manage all voters registered in the system.</p>
+      </div>
+
+      {/* Stat + search row */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold">Registered Voters</h1>
-          <p className="text-sm text-muted-foreground">{total} total</p>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-medium">
+            <i className="bx bx-group text-primary text-sm" />
+            {isLoading ? '—' : total} registered voter{total !== 1 ? 's' : ''}
+          </span>
         </div>
-        <input
-          type="text"
-          placeholder="Search by name or voter ID…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full sm:w-64 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
-        />
+        <div className="relative w-full sm:w-64">
+          <i className="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-base pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search by name or voter ID…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+          />
+        </div>
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
@@ -110,23 +123,40 @@ export default function UsersPage() {
               <tbody className="divide-y divide-border">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
-                      No voters found.
+                    <td colSpan={4} className="px-4 py-10 text-center">
+                      <div className="space-y-1">
+                        <i className="bx bx-search-alt text-2xl text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">No voters found.</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   filtered.map(u => (
                     <tr key={u._id} className="hover:bg-muted/40 transition-colors">
-                      <td className="px-4 py-3 font-medium">{u.fullName}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 select-none">
+                            {u.fullName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
+                          </div>
+                          <span className="font-medium">{u.fullName}</span>
+                        </div>
+                      </td>
                       <td className="px-4 py-3 font-mono text-muted-foreground">{u.voterId}</td>
-                      <td className="px-4 py-3 capitalize">{u.role}</td>
+                      <td className="px-4 py-3 capitalize">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium">
+                          {u.role === 'admin'
+                            ? <><i className="bx bx-shield text-primary text-sm" /> Admin</>
+                            : <><i className="bx bx-user text-muted-foreground text-sm" /> Voter</>
+                          }
+                        </span>
+                      </td>
                       <td className="px-4 py-3 text-right">
                         <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => setDeleteConfirm(u)}
                         >
-                          Delete
+                          <i className="bx bx-trash mr-1 text-sm" /> Delete
                         </Button>
                       </td>
                     </tr>
@@ -144,7 +174,7 @@ export default function UsersPage() {
                 disabled={page <= 1}
                 onClick={() => setPage(p => p - 1)}
               >
-                Previous
+                <i className="bx bx-chevron-left text-base" /> Previous
               </Button>
               <span className="text-sm text-muted-foreground">Page {page} of {pages}</span>
               <Button
@@ -153,7 +183,7 @@ export default function UsersPage() {
                 disabled={page >= pages}
                 onClick={() => setPage(p => p + 1)}
               >
-                Next
+                Next <i className="bx bx-chevron-right text-base" />
               </Button>
             </div>
           )}

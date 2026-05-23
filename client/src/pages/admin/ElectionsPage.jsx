@@ -12,6 +12,18 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
+function StatTile({ icon, label, value, color = 'text-foreground' }) {
+  return (
+    <div className="rounded-xl border border-border p-4 space-y-1">
+      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+        <i className={`bx ${icon} text-sm`} />
+        {label}
+      </p>
+      <p className={`text-2xl font-bold ${color}`}>{value}</p>
+    </div>
+  )
+}
+
 export default function ElectionsPage() {
   const [elections, setElections] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -81,20 +93,51 @@ export default function ElectionsPage() {
     }
   }
 
+  const active = elections.filter(e => e.status === 'active').length
+  const upcoming = elections.filter(e => e.status === 'upcoming').length
+  const closed = elections.filter(e => e.status === 'closed').length
+
   return (
-    <div className="px-4 py-8 space-y-6">
+    <div className="px-6 py-8 space-y-6">
+
+      {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Elections</h1>
-          <p className="text-sm text-muted-foreground">{elections.length} total</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage all community elections from here.</p>
         </div>
         <Button asChild>
-          <Link to="/admin/elections/new">New Election</Link>
+          <Link to="/admin/elections/new">
+            <i className="bx bx-plus text-base mr-1" />
+            New Election
+          </Link>
         </Button>
       </div>
 
+      {/* Stat tiles */}
+      {!isLoading && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <StatTile icon="bx-calendar" label="Total" value={elections.length} />
+          <StatTile icon="bx-radio-circle-marked" label="Active" value={active} color="text-green-600" />
+          <StatTile icon="bx-time-five" label="Upcoming" value={upcoming} color="text-blue-600" />
+          <StatTile icon="bx-lock-alt" label="Closed" value={closed} color="text-muted-foreground" />
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="rounded-xl border border-border p-4 space-y-2">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-7 w-10" />
+            </div>
+          ))}
+        </div>
+      )}
+
       {error && <p className="text-sm text-destructive">{error}</p>}
 
+      {/* Table */}
       {isLoading ? (
         <div className="rounded-xl border border-border overflow-x-auto">
           <table className="w-full text-sm min-w-[640px]">
@@ -121,8 +164,10 @@ export default function ElectionsPage() {
           </table>
         </div>
       ) : elections.length === 0 ? (
-        <div className="rounded-xl border border-border px-6 py-12 text-center text-sm text-muted-foreground">
-          No elections yet. Create one to get started.
+        <div className="rounded-xl border border-dashed border-border px-6 py-14 text-center space-y-2">
+          <i className="bx bx-calendar-x text-3xl text-muted-foreground" />
+          <p className="text-sm font-medium">No elections yet</p>
+          <p className="text-xs text-muted-foreground">Create your first election to get started.</p>
         </div>
       ) : (
         <div className="rounded-xl border border-border overflow-x-auto">
@@ -148,40 +193,35 @@ export default function ElectionsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2 flex-wrap">
                       <Button variant="outline" size="sm" asChild>
-                        <Link to={`/admin/elections/${election._id}`}>Manage</Link>
+                        <Link to={`/admin/elections/${election._id}`}>
+                          <i className="bx bx-cog mr-1 text-sm" /> Manage
+                        </Link>
                       </Button>
                       {election.status === 'upcoming' && (
                         <>
                           <Button variant="outline" size="sm" asChild>
-                            <Link to={`/admin/elections/${election._id}/edit`}>Edit</Link>
+                            <Link to={`/admin/elections/${election._id}/edit`}>
+                              <i className="bx bx-edit mr-1 text-sm" /> Edit
+                            </Link>
                           </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => setOpenConfirm(election)}
-                          >
-                            Open
+                          <Button size="sm" onClick={() => setOpenConfirm(election)}>
+                            <i className="bx bx-play mr-1 text-sm" /> Open
                           </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setDeleteConfirm(election)}
-                          >
-                            Delete
+                          <Button variant="destructive" size="sm" onClick={() => setDeleteConfirm(election)}>
+                            <i className="bx bx-trash mr-1 text-sm" /> Delete
                           </Button>
                         </>
                       )}
                       {election.status === 'active' && (
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setCloseConfirm(election)}
-                        >
-                          Close
+                        <Button variant="destructive" size="sm" onClick={() => setCloseConfirm(election)}>
+                          <i className="bx bx-stop mr-1 text-sm" /> Close
                         </Button>
                       )}
                       {election.status === 'closed' && (
                         <Button variant="outline" size="sm" asChild>
-                          <Link to={`/admin/elections/${election._id}/results`}>Results</Link>
+                          <Link to={`/admin/elections/${election._id}/results`}>
+                            <i className="bx bx-bar-chart-alt-2 mr-1 text-sm" /> Results
+                          </Link>
                         </Button>
                       )}
                     </div>
