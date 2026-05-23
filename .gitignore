@@ -18,3 +18,7 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+seed.csv
+project-plan.md
+CLAUDE.md
