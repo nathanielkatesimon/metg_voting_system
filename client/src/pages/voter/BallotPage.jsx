@@ -5,6 +5,7 @@ import { getPositions } from '@/services/positionService'
 import { getCandidates } from '@/services/candidateService'
 import { getMyVotes } from '@/services/voteService'
 import BallotPosition from '@/components/voting/BallotPosition'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function BallotPage() {
   const { id } = useParams()
@@ -47,7 +48,7 @@ export default function BallotPage() {
     setVotedMap(prev => ({ ...prev, [positionId]: candidateId }))
   }
 
-  if (isLoading) return <div className="px-4 py-8 text-sm text-muted-foreground">Loading…</div>
+  if (isLoading) return <LoadingSpinner />
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   const votedCount = Object.keys(votedMap).length

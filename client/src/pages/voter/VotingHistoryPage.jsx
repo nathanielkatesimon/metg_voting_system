@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getAllMyVotes } from '@/services/voteService'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function VotingHistoryPage() {
   const [history, setHistory] = useState([])
@@ -13,7 +14,7 @@ export default function VotingHistoryPage() {
       .finally(() => setIsLoading(false))
   }, [])
 
-  if (isLoading) return <div className="px-4 py-8 text-sm text-muted-foreground">Loading…</div>
+  if (isLoading) return <LoadingSpinner />
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   return (

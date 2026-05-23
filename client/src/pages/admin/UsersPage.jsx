@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { getAdminUsers, deleteAdminUser } from '@/services/userService'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Button } from '@/components/ui/button'
+import { showSuccess, showError } from '@/lib/toast'
 
 export default function UsersPage() {
   const [users, setUsers] = useState([])
@@ -37,9 +40,10 @@ export default function UsersPage() {
     try {
       await deleteAdminUser(user._id)
       setDeleteConfirm(null)
+      showSuccess(`${user.fullName} has been removed.`)
       fetchUsers(page)
     } catch (err) {
-      alert(err.response?.data?.message || 'Delete failed.')
+      showError(err.response?.data?.message || 'Delete failed.')
     } finally {
       setIsDeleting(false)
     }
@@ -52,7 +56,7 @@ export default function UsersPage() {
 
   return (
     <div className="px-4 py-8 space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold">Registered Voters</h1>
           <p className="text-sm text-muted-foreground">{total} total</p>
@@ -62,18 +66,18 @@ export default function UsersPage() {
           placeholder="Search by name or voter ID…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-64 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+          className="w-full sm:w-64 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
         />
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {isLoading ? (
-        <div className="text-sm text-muted-foreground">Loading…</div>
+        <LoadingSpinner />
       ) : (
         <>
-          <div className="rounded-xl border border-border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-xl border border-border overflow-x-auto">
+            <table className="w-full text-sm min-w-[480px]">
               <thead className="bg-muted text-muted-foreground">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium">Full Name</th>
@@ -136,23 +140,13 @@ export default function UsersPage() {
       )}
 
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-background rounded-xl border border-border shadow-lg p-6 w-full max-w-sm space-y-4">
-            <h2 className="font-semibold">Delete Voter</h2>
-            <p className="text-sm text-muted-foreground">
-              Remove <span className="font-medium text-foreground">{deleteConfirm.fullName}</span> ({deleteConfirm.voterId})?
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setDeleteConfirm(null)} disabled={isDeleting}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={() => handleDelete(deleteConfirm)} disabled={isDeleting}>
-                {isDeleting ? 'Deleting…' : 'Delete'}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="Delete Voter"
+          description={`Remove ${deleteConfirm.fullName} (${deleteConfirm.voterId})? This action cannot be undone.`}
+          onConfirm={() => handleDelete(deleteConfirm)}
+          onClose={() => setDeleteConfirm(null)}
+          isLoading={isDeleting}
+        />
       )}
     </div>
   )

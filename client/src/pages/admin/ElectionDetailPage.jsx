@@ -7,7 +7,10 @@ import ElectionStatusBadge from '@/components/elections/ElectionStatusBadge'
 import PositionFormModal from '@/components/positions/PositionFormModal'
 import CandidateCard from '@/components/candidates/CandidateCard'
 import CandidateFormModal from '@/components/candidates/CandidateFormModal'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Button } from '@/components/ui/button'
+import { showSuccess, showError } from '@/lib/toast'
 
 export default function ElectionDetailPage() {
   const { id } = useParams()
@@ -52,8 +55,9 @@ export default function ElectionDetailPage() {
       setPositions(prev => prev.filter(p => p._id !== position._id))
       setCandidates(prev => prev.filter(c => c.positionId !== position._id))
       setDeletePositionConfirm(null)
+      showSuccess(`Position "${position.name}" deleted.`)
     } catch (err) {
-      alert(err.response?.data?.message || 'Delete failed.')
+      showError(err.response?.data?.message || 'Delete failed.')
     } finally {
       setIsDeletingPosition(false)
     }
@@ -73,14 +77,15 @@ export default function ElectionDetailPage() {
       await deleteCandidate(candidate._id)
       setCandidates(prev => prev.filter(c => c._id !== candidate._id))
       setDeleteCandidateConfirm(null)
+      showSuccess(`${candidate.name} removed.`)
     } catch (err) {
-      alert(err.response?.data?.message || 'Delete failed.')
+      showError(err.response?.data?.message || 'Delete failed.')
     } finally {
       setIsDeletingCandidate(false)
     }
   }
 
-  if (isLoading) return <div className="px-4 py-8 text-sm text-muted-foreground">Loading…</div>
+  if (isLoading) return <LoadingSpinner />
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   const canEdit = election.status !== 'closed'
@@ -131,7 +136,6 @@ export default function ElectionDetailPage() {
               const positionCandidates = candidatesByPosition[position._id] || []
               return (
                 <div key={position._id} className="rounded-xl border border-border overflow-hidden">
-                  {/* Position header */}
                   <div className="flex items-center justify-between px-4 py-3 bg-muted/60 border-b border-border">
                     <div className="flex items-center gap-3">
                       <span className="text-xs font-mono text-muted-foreground w-6 text-center">{position.order}</span>
@@ -158,7 +162,6 @@ export default function ElectionDetailPage() {
                     )}
                   </div>
 
-                  {/* Candidates grid */}
                   <div className="p-4">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                       {positionCandidates.map(candidate => (
@@ -209,7 +212,6 @@ export default function ElectionDetailPage() {
         )}
       </section>
 
-      {/* Position form modal */}
       {positionModal && (
         <PositionFormModal
           electionId={id}
@@ -219,28 +221,16 @@ export default function ElectionDetailPage() {
         />
       )}
 
-      {/* Delete position confirmation */}
       {deletePositionConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-background rounded-xl border border-border shadow-lg p-6 w-full max-w-sm space-y-4">
-            <h2 className="font-semibold">Delete Position</h2>
-            <p className="text-sm text-muted-foreground">
-              Delete <span className="font-medium text-foreground">"{deletePositionConfirm.name}"</span> and all its candidates?
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setDeletePositionConfirm(null)} disabled={isDeletingPosition}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={() => handleDeletePosition(deletePositionConfirm)} disabled={isDeletingPosition}>
-                {isDeletingPosition ? 'Deleting…' : 'Delete'}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="Delete Position"
+          description={`Delete "${deletePositionConfirm.name}" and all its candidates? This action cannot be undone.`}
+          onConfirm={() => handleDeletePosition(deletePositionConfirm)}
+          onClose={() => setDeletePositionConfirm(null)}
+          isLoading={isDeletingPosition}
+        />
       )}
 
-      {/* Candidate form modal */}
       {candidateModal && (
         <CandidateFormModal
           electionId={id}
@@ -251,25 +241,14 @@ export default function ElectionDetailPage() {
         />
       )}
 
-      {/* Delete candidate confirmation */}
       {deleteCandidateConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-background rounded-xl border border-border shadow-lg p-6 w-full max-w-sm space-y-4">
-            <h2 className="font-semibold">Delete Candidate</h2>
-            <p className="text-sm text-muted-foreground">
-              Remove <span className="font-medium text-foreground">{deleteCandidateConfirm.name}</span>?
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setDeleteCandidateConfirm(null)} disabled={isDeletingCandidate}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={() => handleDeleteCandidate(deleteCandidateConfirm)} disabled={isDeletingCandidate}>
-                {isDeletingCandidate ? 'Deleting…' : 'Delete'}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="Delete Candidate"
+          description={`Remove ${deleteCandidateConfirm.name}? This action cannot be undone.`}
+          onConfirm={() => handleDeleteCandidate(deleteCandidateConfirm)}
+          onClose={() => setDeleteCandidateConfirm(null)}
+          isLoading={isDeletingCandidate}
+        />
       )}
     </div>
   )

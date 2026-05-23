@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { createCandidate, updateCandidate } from '@/services/candidateService'
 import { Button } from '@/components/ui/button'
+import { showSuccess } from '@/lib/toast'
 
 export default function CandidateFormModal({ electionId, positionId, candidate, onSuccess, onClose }) {
   const isEdit = Boolean(candidate)
@@ -46,6 +47,7 @@ export default function CandidateFormModal({ electionId, positionId, candidate, 
       const saved = isEdit
         ? await updateCandidate(candidate._id, data)
         : await createCandidate(data)
+      showSuccess(isEdit ? 'Candidate updated.' : 'Candidate added.')
       onSuccess(saved)
     } catch (err) {
       setError(err.response?.data?.message || 'Save failed.')

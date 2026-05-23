@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createPosition, updatePosition } from '@/services/positionService'
 import { Button } from '@/components/ui/button'
+import { showSuccess } from '@/lib/toast'
 
 export default function PositionFormModal({ electionId, position, onSuccess, onClose }) {
   const isEdit = Boolean(position)
@@ -26,6 +27,7 @@ export default function PositionFormModal({ electionId, position, onSuccess, onC
       const saved = isEdit
         ? await updatePosition(position._id, form)
         : await createPosition(electionId, form)
+      showSuccess(isEdit ? 'Position updated.' : 'Position added.')
       onSuccess(saved)
     } catch (err) {
       setError(err.response?.data?.message || 'Save failed.')

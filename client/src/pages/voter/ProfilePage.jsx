@@ -2,24 +2,25 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { updateProfile, changePassword } from '@/services/userService'
 import { Button } from '@/components/ui/button'
+import { showSuccess, showError } from '@/lib/toast'
 
 function ProfileForm({ user, onUpdated }) {
   const [fullName, setFullName] = useState(user.fullName)
-  const [status, setStatus] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setStatus(null)
-    if (!fullName.trim()) return setStatus({ type: 'error', message: 'Name is required.' })
+    setError('')
+    if (!fullName.trim()) return setError('Name is required.')
 
     setIsSubmitting(true)
     try {
       const updated = await updateProfile({ fullName: fullName.trim() })
       onUpdated(updated)
-      setStatus({ type: 'success', message: 'Profile updated.' })
+      showSuccess('Profile updated.')
     } catch (err) {
-      setStatus({ type: 'error', message: err.response?.data?.message || 'Update failed.' })
+      setError(err.response?.data?.message || 'Update failed.')
     } finally {
       setIsSubmitting(false)
     }
@@ -33,7 +34,7 @@ function ProfileForm({ user, onUpdated }) {
           id="fullName"
           type="text"
           value={fullName}
-          onChange={e => setFullName(e.target.value)}
+          onChange={e => { setFullName(e.target.value); setError('') }}
           className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
         />
       </div>
@@ -59,11 +60,7 @@ function ProfileForm({ user, onUpdated }) {
         />
       </div>
 
-      {status && (
-        <p className={`text-sm ${status.type === 'error' ? 'text-destructive' : 'text-green-600'}`}>
-          {status.message}
-        </p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Saving…' : 'Save Changes'}
@@ -74,35 +71,35 @@ function ProfileForm({ user, onUpdated }) {
 
 function PasswordForm() {
   const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
-  const [status, setStatus] = useState(null)
+  const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   function handleChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
-    setStatus(null)
+    setError('')
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setStatus(null)
+    setError('')
 
     if (!form.currentPassword || !form.newPassword || !form.confirmPassword) {
-      return setStatus({ type: 'error', message: 'All fields are required.' })
+      return setError('All fields are required.')
     }
     if (form.newPassword.length < 8) {
-      return setStatus({ type: 'error', message: 'New password must be at least 8 characters.' })
+      return setError('New password must be at least 8 characters.')
     }
     if (form.newPassword !== form.confirmPassword) {
-      return setStatus({ type: 'error', message: 'New passwords do not match.' })
+      return setError('New passwords do not match.')
     }
 
     setIsSubmitting(true)
     try {
       await changePassword({ currentPassword: form.currentPassword, newPassword: form.newPassword })
-      setStatus({ type: 'success', message: 'Password changed successfully.' })
+      showSuccess('Password changed successfully.')
       setForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (err) {
-      setStatus({ type: 'error', message: err.response?.data?.message || 'Failed to change password.' })
+      setError(err.response?.data?.message || 'Failed to change password.')
     } finally {
       setIsSubmitting(false)
     }
@@ -129,11 +126,7 @@ function PasswordForm() {
         </div>
       ))}
 
-      {status && (
-        <p className={`text-sm ${status.type === 'error' ? 'text-destructive' : 'text-green-600'}`}>
-          {status.message}
-        </p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Updating…' : 'Change Password'}
@@ -143,12 +136,8 @@ function PasswordForm() {
 }
 
 export default function ProfilePage() {
-  const { user, login: refreshUser } = useAuth()
+  const { user } = useAuth()
   const [currentUser, setCurrentUser] = useState(user)
-
-  function handleUpdated(updated) {
-    setCurrentUser(updated)
-  }
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
@@ -156,7 +145,7 @@ export default function ProfilePage() {
 
       <section className="rounded-xl border border-border p-6 space-y-4">
         <h2 className="text-base font-semibold">Personal Information</h2>
-        <ProfileForm user={currentUser} onUpdated={handleUpdated} />
+        <ProfileForm user={currentUser} onUpdated={setCurrentUser} />
       </section>
 
       <section className="rounded-xl border border-border p-6 space-y-4">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getElection, createElection, updateElection } from '@/services/electionService'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Button } from '@/components/ui/button'
 
 function toDateInputValue(dateStr) {
@@ -58,7 +59,7 @@ export default function ElectionFormPage() {
     }
   }
 
-  if (isLoading) return <div className="px-4 py-8 text-sm text-muted-foreground">Loading…</div>
+  if (isLoading) return <LoadingSpinner />
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">

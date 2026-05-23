@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getAdminElections, deleteElection, openElection, closeElection } from '@/services/electionService'
 import ElectionStatusBadge from '@/components/elections/ElectionStatusBadge'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Button } from '@/components/ui/button'
+import { showSuccess, showError } from '@/lib/toast'
 
 function formatDate(dateStr) {
   if (!dateStr) return '—'
@@ -39,8 +42,9 @@ export default function ElectionsPage() {
     try {
       const updated = await openElection(election._id)
       setElections(prev => prev.map(e => e._id === updated._id ? updated : e))
+      showSuccess(`"${election.title}" is now open for voting.`)
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to open election.')
+      showError(err.response?.data?.message || 'Failed to open election.')
     } finally {
       setActionLoading(null)
     }
@@ -51,8 +55,9 @@ export default function ElectionsPage() {
     try {
       const updated = await closeElection(election._id)
       setElections(prev => prev.map(e => e._id === updated._id ? updated : e))
+      showSuccess(`"${election.title}" has been closed.`)
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to close election.')
+      showError(err.response?.data?.message || 'Failed to close election.')
     } finally {
       setActionLoading(null)
     }
@@ -64,8 +69,9 @@ export default function ElectionsPage() {
       await deleteElection(election._id)
       setElections(prev => prev.filter(e => e._id !== election._id))
       setDeleteConfirm(null)
+      showSuccess('Election deleted.')
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete election.')
+      showError(err.response?.data?.message || 'Failed to delete election.')
     } finally {
       setIsDeleting(false)
     }
@@ -86,14 +92,14 @@ export default function ElectionsPage() {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {isLoading ? (
-        <div className="text-sm text-muted-foreground">Loading…</div>
+        <LoadingSpinner />
       ) : elections.length === 0 ? (
         <div className="rounded-xl border border-border px-6 py-12 text-center text-sm text-muted-foreground">
           No elections yet. Create one to get started.
         </div>
       ) : (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-xl border border-border overflow-x-auto">
+          <table className="w-full text-sm min-w-[640px]">
             <thead className="bg-muted text-muted-foreground">
               <tr>
                 <th className="text-left px-4 py-3 font-medium">Title</th>
@@ -113,7 +119,7 @@ export default function ElectionsPage() {
                   <td className="px-4 py-3 text-muted-foreground">{formatDate(election.startDate)}</td>
                   <td className="px-4 py-3 text-muted-foreground">{formatDate(election.endDate)}</td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2 flex-wrap">
                       <Button variant="outline" size="sm" asChild>
                         <Link to={`/admin/elections/${election._id}`}>Manage</Link>
                       </Button>
@@ -163,23 +169,13 @@ export default function ElectionsPage() {
       )}
 
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-background rounded-xl border border-border shadow-lg p-6 w-full max-w-sm space-y-4">
-            <h2 className="font-semibold">Delete Election</h2>
-            <p className="text-sm text-muted-foreground">
-              Delete <span className="font-medium text-foreground">"{deleteConfirm.title}"</span>?
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setDeleteConfirm(null)} disabled={isDeleting}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={() => handleDelete(deleteConfirm)} disabled={isDeleting}>
-                {isDeleting ? 'Deleting…' : 'Delete'}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="Delete Election"
+          description={`Delete "${deleteConfirm.title}"? This action cannot be undone.`}
+          onConfirm={() => handleDelete(deleteConfirm)}
+          onClose={() => setDeleteConfirm(null)}
+          isLoading={isDeleting}
+        />
       )}
     </div>
   )

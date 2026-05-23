@@ -5,6 +5,7 @@ import { getResults, getStats } from '@/services/resultsService'
 import ParticipationStatsCards from '@/components/results/ParticipationStatsCards'
 import VoteBarChart from '@/components/results/VoteBarChart'
 import CandidateRankingTable from '@/components/results/CandidateRankingTable'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Button } from '@/components/ui/button'
 
 export default function ResultsPage() {
@@ -26,7 +27,7 @@ export default function ResultsPage() {
       .finally(() => setIsLoading(false))
   }, [id])
 
-  if (isLoading) return <div className="px-4 py-8 text-sm text-muted-foreground">Loading…</div>
+  if (isLoading) return <LoadingSpinner />
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
   const totalVotes = results.reduce(
