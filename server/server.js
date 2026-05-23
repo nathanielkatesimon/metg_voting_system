@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -13,8 +14,10 @@ const userRoutes = require('./routes/users');
 const adminUserRoutes = require('./routes/admin/users');
 const adminElectionRoutes = require('./routes/admin/elections');
 const adminPositionRoutes = require('./routes/admin/positions');
+const adminCandidateRoutes = require('./routes/admin/candidates');
 const electionRoutes = require('./routes/elections');
 const positionRoutes = require('./routes/positions');
+const candidateRoutes = require('./routes/candidates');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +25,8 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 app.use(helmet());
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors({
   origin: process.env.CLIENT_URL,
@@ -56,8 +61,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/elections', adminElectionRoutes);
 app.use('/api/admin', adminPositionRoutes);
+app.use('/api/admin/candidates', adminCandidateRoutes);
 app.use('/api/elections', electionRoutes);
 app.use('/api/elections', positionRoutes);
+app.use('/api/elections', candidateRoutes);
 
 app.use(errorHandler);
 
