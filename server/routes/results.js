@@ -5,7 +5,7 @@ const Vote = require('../models/Vote');
 const Position = require('../models/Position');
 const Candidate = require('../models/Candidate');
 const User = require('../models/User');
-const { requireAdmin } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 async function fetchResultsData(electionId) {
   const [positions, candidates, voteCounts] = await Promise.all([
@@ -52,7 +52,7 @@ async function fetchResultsData(electionId) {
 }
 
 // GET /api/elections/:id/results
-router.get('/:id/results', requireAdmin, async (req, res, next) => {
+router.get('/:id/results', requireAuth, async (req, res, next) => {
   try {
     const results = await fetchResultsData(req.params.id);
     res.json(results);
