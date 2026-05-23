@@ -12,7 +12,9 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const adminUserRoutes = require('./routes/admin/users');
 const adminElectionRoutes = require('./routes/admin/elections');
+const adminPositionRoutes = require('./routes/admin/positions');
 const electionRoutes = require('./routes/elections');
+const positionRoutes = require('./routes/positions');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -53,7 +55,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/elections', adminElectionRoutes);
+app.use('/api/admin', adminPositionRoutes);
 app.use('/api/elections', electionRoutes);
+app.use('/api/elections', positionRoutes);
 
 app.use(errorHandler);
 

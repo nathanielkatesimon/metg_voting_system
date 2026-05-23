@@ -10,6 +10,7 @@ import VoterElectionsPage from '@/pages/voter/ElectionsPage'
 import UsersPage from '@/pages/admin/UsersPage'
 import AdminElectionsPage from '@/pages/admin/ElectionsPage'
 import ElectionFormPage from '@/pages/admin/ElectionFormPage'
+import ElectionDetailPage from '@/pages/admin/ElectionDetailPage'
 
 function RootRedirect() {
   const { user, isLoading } = useAuth()
@@ -35,7 +36,7 @@ function App() {
       <Route path="/admin/elections" element={<AdminRoute><AdminElectionsPage /></AdminRoute>} />
       <Route path="/admin/elections/new" element={<AdminRoute><ElectionFormPage /></AdminRoute>} />
       <Route path="/admin/elections/:id/edit" element={<AdminRoute><ElectionFormPage /></AdminRoute>} />
-      <Route path="/admin/elections/:id" element={<AdminRoute><div>Election Detail (coming soon)</div></AdminRoute>} />
+      <Route path="/admin/elections/:id" element={<AdminRoute><ElectionDetailPage /></AdminRoute>} />
       <Route path="/admin/elections/:id/results" element={<AdminRoute><div>Results (coming soon)</div></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
     </Routes>
