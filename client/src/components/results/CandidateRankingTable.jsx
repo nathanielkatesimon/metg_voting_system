@@ -1,4 +1,4 @@
-export default function CandidateRankingTable({ candidates }) {
+export default function CandidateRankingTable({ candidates, seats = 1 }) {
   const totalVotes = candidates.reduce((sum, c) => sum + c.voteCount, 0)
 
   return (
@@ -11,23 +11,24 @@ export default function CandidateRankingTable({ candidates }) {
             <th className="py-2 px-3 font-medium">Party</th>
             <th className="py-2 px-3 font-medium text-right">Votes</th>
             <th className="py-2 px-3 font-medium text-right">%</th>
+            {seats > 1 && <th className="py-2 px-3 font-medium text-right">Status</th>}
           </tr>
         </thead>
         <tbody>
           {candidates.length === 0 ? (
             <tr>
-              <td colSpan={5} className="py-6 text-center text-muted-foreground">No candidates.</td>
+              <td colSpan={seats > 1 ? 6 : 5} className="py-6 text-center text-muted-foreground">No candidates.</td>
             </tr>
           ) : (
             candidates.map((c, i) => {
               const pct = totalVotes > 0 ? ((c.voteCount / totalVotes) * 100).toFixed(1) : '0.0'
-              const isLeader = i === 0 && c.voteCount > 0
+              const isElected = i < seats && c.voteCount > 0
               return (
                 <tr
                   key={c.candidateId}
                   className={[
                     'border-b border-border last:border-0',
-                    isLeader ? 'bg-primary/5 font-medium' : '',
+                    isElected ? 'bg-green-50 dark:bg-green-950/20 font-medium' : '',
                   ].join(' ')}
                 >
                   <td className="py-2 px-3 text-muted-foreground">{i + 1}</td>
@@ -35,6 +36,13 @@ export default function CandidateRankingTable({ candidates }) {
                   <td className="py-2 px-3 text-muted-foreground">{c.party || '—'}</td>
                   <td className="py-2 px-3 text-right">{c.voteCount}</td>
                   <td className="py-2 px-3 text-right">{pct}%</td>
+                  {seats > 1 && (
+                    <td className="py-2 px-3 text-right">
+                      {isElected
+                        ? <span className="text-green-600 text-xs font-semibold">Elected</span>
+                        : <span className="text-muted-foreground text-xs">—</span>}
+                    </td>
+                  )}
                 </tr>
               )
             })

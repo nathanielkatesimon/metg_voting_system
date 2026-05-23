@@ -8,12 +8,14 @@ export default function PositionFormModal({ electionId, position, onSuccess, onC
   const [form, setForm] = useState({
     name: position?.name ?? '',
     order: position?.order ?? 0,
+    seats: position?.seats ?? 1,
   })
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   function handleChange(e) {
-    const value = e.target.name === 'order' ? Number(e.target.value) : e.target.value
+    const numericFields = ['order', 'seats']
+    const value = numericFields.includes(e.target.name) ? Number(e.target.value) : e.target.value
     setForm(prev => ({ ...prev, [e.target.name]: value }))
     setError('')
   }
@@ -67,6 +69,20 @@ export default function PositionFormModal({ electionId, position, onSuccess, onC
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
             />
             <p className="text-xs text-muted-foreground">Lower numbers appear first on the ballot.</p>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium" htmlFor="pos-seats">Number of Seats</label>
+            <input
+              id="pos-seats"
+              name="seats"
+              type="number"
+              min="1"
+              value={form.seats}
+              onChange={handleChange}
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            />
+            <p className="text-xs text-muted-foreground">Voters may select up to this many candidates for this position.</p>
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}

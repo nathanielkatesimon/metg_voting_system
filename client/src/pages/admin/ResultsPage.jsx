@@ -69,8 +69,11 @@ export default function ResultsPage() {
         <div className="space-y-8">
           {results.map(pos => (
             <div key={pos.positionId} className="rounded-xl border border-border overflow-hidden">
-              <div className="px-4 py-3 bg-muted/60 border-b border-border">
+              <div className="px-4 py-3 bg-muted/60 border-b border-border flex items-center gap-3">
                 <h2 className="font-semibold">{pos.positionName}</h2>
+                {pos.seats > 1 && (
+                  <span className="text-xs text-muted-foreground">({pos.seats} seats)</span>
+                )}
               </div>
               <div className="p-4 space-y-4">
                 {pos.candidates.length === 0 ? (
@@ -78,7 +81,7 @@ export default function ResultsPage() {
                 ) : (
                   <>
                     <VoteBarChart candidates={pos.candidates} />
-                    <CandidateRankingTable candidates={pos.candidates} />
+                    <CandidateRankingTable candidates={pos.candidates} seats={pos.seats} />
                   </>
                 )}
               </div>

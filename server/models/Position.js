@@ -4,6 +4,7 @@ const positionSchema = new mongoose.Schema({
   electionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Election', required: true },
   name: { type: String, required: true, trim: true },
   order: { type: Number, default: 0 },
+  seats: { type: Number, default: 1, min: 1 },
 }, { timestamps: true });
 
 positionSchema.index({ electionId: 1, order: 1 });

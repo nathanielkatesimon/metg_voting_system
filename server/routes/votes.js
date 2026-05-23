@@ -26,27 +26,37 @@ router.post('/votes', requireVoter, async (req, res, next) => {
     const candidate = await Candidate.findOne({ _id: candidateId, positionId });
     if (!candidate) return res.status(400).json({ message: 'Candidate does not belong to this position.' });
 
-    const existing = await Vote.exists({ electionId, positionId, voterId: req.user._id });
-    if (existing) return res.status(409).json({ message: 'You have already voted for this position.' });
+    const castCount = await Vote.countDocuments({ electionId, positionId, voterId: req.user._id });
+    if (castCount >= position.seats) {
+      return res.status(409).json({ message: `You have already used all ${position.seats} vote(s) for this position.` });
+    }
 
     const vote = await Vote.create({ electionId, positionId, candidateId, voterId: req.user._id });
     res.status(201).json(vote);
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(409).json({ message: 'You have already voted for this position.' });
+      return res.status(409).json({ message: 'You have already voted for this candidate in this position.' });
     }
     next(err);
   }
 });
 
 // GET /api/elections/:electionId/my-votes
+// Returns votes grouped by position: [{ positionId, candidateIds: [...] }]
 router.get('/elections/:electionId/my-votes', requireVoter, async (req, res, next) => {
   try {
     const votes = await Vote.find({
       electionId: req.params.electionId,
       voterId: req.user._id,
     }).select('positionId candidateId');
-    res.json(votes.map(v => ({ positionId: v.positionId, candidateId: v.candidateId })));
+
+    const grouped = {};
+    for (const v of votes) {
+      const pid = v.positionId.toString();
+      if (!grouped[pid]) grouped[pid] = { positionId: v.positionId, candidateIds: [] };
+      grouped[pid].candidateIds.push(v.candidateId);
+    }
+    res.json(Object.values(grouped));
   } catch (err) {
     next(err);
   }

@@ -16,13 +16,17 @@ router.post('/elections/:electionId/positions', async (req, res, next) => {
       return res.status(400).json({ message: 'Cannot add positions to a closed election.' });
     }
 
-    const { name, order } = req.body;
+    const { name, order, seats } = req.body;
     if (!name?.trim()) return res.status(400).json({ message: 'Position name is required.' });
+    if (seats !== undefined && (typeof seats !== 'number' || seats < 1 || !Number.isInteger(seats))) {
+      return res.status(400).json({ message: 'Seats must be a positive integer.' });
+    }
 
     const position = await Position.create({
       electionId: req.params.electionId,
       name: name.trim(),
       order: order ?? 0,
+      seats: seats ?? 1,
     });
     res.status(201).json(position);
   } catch (err) {
@@ -36,9 +40,15 @@ router.put('/positions/:id', async (req, res, next) => {
     const position = await Position.findById(req.params.id);
     if (!position) return res.status(404).json({ message: 'Position not found.' });
 
-    const { name, order } = req.body;
+    const { name, order, seats } = req.body;
     if (name !== undefined) position.name = name.trim();
     if (order !== undefined) position.order = order;
+    if (seats !== undefined) {
+      if (typeof seats !== 'number' || seats < 1 || !Number.isInteger(seats)) {
+        return res.status(400).json({ message: 'Seats must be a positive integer.' });
+      }
+      position.seats = seats;
+    }
 
     await position.save();
     res.json(position);

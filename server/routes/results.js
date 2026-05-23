@@ -45,6 +45,7 @@ async function fetchResultsData(electionId) {
     return {
       positionId: pos._id,
       positionName: pos.name,
+      seats: pos.seats ?? 1,
       candidates: positionCandidates,
     };
   });

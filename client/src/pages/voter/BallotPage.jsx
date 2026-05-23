@@ -36,7 +36,7 @@ export default function BallotPage() {
 
         const vMap = {}
         for (const v of myVotes) {
-          vMap[v.positionId] = v.candidateId
+          vMap[v.positionId] = v.candidateIds || []
         }
         setVotedMap(vMap)
       })
@@ -44,14 +44,17 @@ export default function BallotPage() {
       .finally(() => setIsLoading(false))
   }, [id, navigate])
 
-  function handleVoteCast(positionId, candidateId) {
-    setVotedMap(prev => ({ ...prev, [positionId]: candidateId }))
+  function handleVoteCast(positionId, newCandidateIds) {
+    setVotedMap(prev => ({
+      ...prev,
+      [positionId]: [...(prev[positionId] || []), ...newCandidateIds],
+    }))
   }
 
   if (isLoading) return <LoadingSpinner />
   if (error) return <div className="px-4 py-8 text-sm text-destructive">{error}</div>
 
-  const votedCount = Object.keys(votedMap).length
+  const votedCount = positions.filter(p => (votedMap[p._id] || []).length >= p.seats).length
   const totalPositions = positions.length
 
   return (
@@ -78,8 +81,8 @@ export default function BallotPage() {
               election={election}
               position={position}
               candidates={candidatesByPosition[position._id] || []}
-              votedCandidateId={votedMap[position._id] ?? null}
-              onVoteCast={(candidateId) => handleVoteCast(position._id, candidateId)}
+              votedCandidateIds={votedMap[position._id] ?? []}
+              onVoteCast={(newCandidateIds) => handleVoteCast(position._id, newCandidateIds)}
             />
           ))}
         </div>

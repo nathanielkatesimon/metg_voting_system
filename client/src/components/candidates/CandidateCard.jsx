@@ -1,4 +1,4 @@
-export default function CandidateCard({ candidate, selected, onClick }) {
+export default function CandidateCard({ candidate, selected, voted, onClick }) {
   const initials = candidate.name
     .split(' ')
     .map(w => w[0])
@@ -6,15 +6,19 @@ export default function CandidateCard({ candidate, selected, onClick }) {
     .slice(0, 2)
     .toUpperCase()
 
+  const cardClass = voted
+    ? 'border-green-500 bg-green-50 ring-2 ring-green-200 dark:bg-green-950/20 dark:ring-green-800'
+    : selected
+      ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+      : 'border-border hover:bg-muted/40'
+
   return (
     <div
       onClick={onClick}
       className={[
         'rounded-xl border p-4 space-y-3 transition-colors',
         onClick ? 'cursor-pointer' : '',
-        selected
-          ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-          : 'border-border hover:bg-muted/40',
+        cardClass,
       ].join(' ')}
     >
       <div className="flex justify-center">
@@ -41,7 +45,10 @@ export default function CandidateCard({ candidate, selected, onClick }) {
         )}
       </div>
 
-      {selected && (
+      {voted && (
+        <p className="text-center text-xs font-medium text-green-600">✓ Voted</p>
+      )}
+      {!voted && selected && (
         <p className="text-center text-xs font-medium text-primary">✓ Selected</p>
       )}
     </div>
