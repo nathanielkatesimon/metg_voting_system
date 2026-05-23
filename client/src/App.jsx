@@ -11,6 +11,7 @@ import UsersPage from '@/pages/admin/UsersPage'
 import AdminElectionsPage from '@/pages/admin/ElectionsPage'
 import ElectionFormPage from '@/pages/admin/ElectionFormPage'
 import ElectionDetailPage from '@/pages/admin/ElectionDetailPage'
+import ResultsPage from '@/pages/admin/ResultsPage'
 import BallotPage from '@/pages/voter/BallotPage'
 import VotingHistoryPage from '@/pages/voter/VotingHistoryPage'
 
@@ -40,7 +41,7 @@ function App() {
       <Route path="/admin/elections/new" element={<AdminRoute><ElectionFormPage /></AdminRoute>} />
       <Route path="/admin/elections/:id/edit" element={<AdminRoute><ElectionFormPage /></AdminRoute>} />
       <Route path="/admin/elections/:id" element={<AdminRoute><ElectionDetailPage /></AdminRoute>} />
-      <Route path="/admin/elections/:id/results" element={<AdminRoute><div>Results (coming soon)</div></AdminRoute>} />
+      <Route path="/admin/elections/:id/results" element={<AdminRoute><ResultsPage /></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
     </Routes>
   )
