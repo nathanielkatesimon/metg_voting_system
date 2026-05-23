@@ -70,6 +70,13 @@ app.use('/api/elections', candidateRoutes);
 app.use('/api', voteRoutes);
 app.use('/api/elections', resultRoutes);
 
+// Serve React production build
+const clientDist = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {
