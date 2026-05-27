@@ -15,7 +15,7 @@ A web-based e-voting platform for purok (community) elections, built on the MERN
 ## Roles
 
 - **Admin** — manage elections, positions, candidates, and users; view results
-- **Voter** — register, log in with voter ID, cast ballots, view voting history
+- **Voter** — log in with voter ID, cast ballots, view voting history
 
 ## Quick Start
 
@@ -66,7 +66,7 @@ Loads 74 registered community members (voter IDs `CCF-001` – `CCF-074`) and a 
   pages/
     admin/      ElectionsPage, ElectionDetail, ElectionForm, Results, Users
     voter/      ElectionsPage, Ballot, VotingHistory, Profile
-    auth/       Login, Register
+    auth/       Login, AdminLogin
   components/   candidates, elections, voting, results, layout, ui
   context/      AuthContext
   lib/          axios instance, toast helpers
@@ -76,7 +76,6 @@ Loads 74 registered community members (voter IDs `CCF-001` – `CCF-074`) and a 
 
 | Method | Path | Description |
 |---|---|---|
-| POST | `/api/auth/register` | Register voter |
 | POST | `/api/auth/login` | Login |
 | POST | `/api/auth/logout` | Logout |
 | GET | `/api/auth/me` | Current session |
@@ -85,10 +84,12 @@ Loads 74 registered community members (voter IDs `CCF-001` – `CCF-074`) and a 
 | GET | `/api/elections/:id/results` | Election results |
 | GET | `/api/admin/elections` | Manage elections (admin) |
 | GET | `/api/admin/users` | Manage users (admin) |
+| GET | `/api/admin/candidates` | Manage candidates (admin) |
 
 ## Key Design Decisions
 
-- Login credential is `voterId` (e.g. `CCF-001`), not email
+- Voters are pre-seeded by admin — there is no self-registration
+- Login credential is `voterId` (e.g. `CCF-001`), not email; admins use a separate login page
 - Duplicate vote prevention via compound DB index `{ electionId, positionId, voterId }`
 - Election lifecycle: `upcoming → active → closed` (no backward transitions)
 - Sessions stored in MongoDB via connect-mongo (7-day cookie)
