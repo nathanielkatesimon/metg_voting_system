@@ -5,7 +5,7 @@ import AdminRoute from '@/components/routing/AdminRoute'
 import VoterLayout from '@/components/layout/VoterLayout'
 import AdminLayout from '@/components/layout/AdminLayout'
 import LoginPage from '@/pages/auth/LoginPage'
-import RegisterPage from '@/pages/auth/RegisterPage'
+import AdminLoginPage from '@/pages/auth/AdminLoginPage'
 import UnauthorizedPage from '@/pages/UnauthorizedPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import ProfilePage from '@/pages/voter/ProfilePage'
@@ -17,6 +17,7 @@ import AdminElectionsPage from '@/pages/admin/ElectionsPage'
 import ElectionFormPage from '@/pages/admin/ElectionFormPage'
 import ElectionDetailPage from '@/pages/admin/ElectionDetailPage'
 import ResultsPage from '@/pages/admin/ResultsPage'
+import ManageCandidatesPage from '@/pages/admin/ManageCandidatesPage'
 
 function RootRedirect() {
   const { user, isLoading } = useAuth()
@@ -30,7 +31,7 @@ function App() {
     <Routes>
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/admin-login" element={<AdminLoginPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       {/* Voter routes — wrapped in VoterLayout */}
@@ -49,6 +50,7 @@ function App() {
         <Route path="/admin/elections/:id" element={<ElectionDetailPage />} />
         <Route path="/admin/elections/:id/results" element={<ResultsPage />} />
         <Route path="/admin/users" element={<UsersPage />} />
+        <Route path="/admin/candidates" element={<ManageCandidatesPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

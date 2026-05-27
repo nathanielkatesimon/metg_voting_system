@@ -94,33 +94,33 @@ const POSITIONS = [
   { name: 'Members',        order: 6, seats: 2 },
 ];
 
-// Keyed by position name → array of { name, party }
+// Keyed by position name → array of { name, party, imagePath }
 const CANDIDATES = {
   'President': [
-    { name: 'Berido, Alfredo',    party: 'Party List A' },
-    { name: 'Entino, Mary Grace', party: 'Party List B' },
+    { name: 'Berido, Alfredo',    party: 'Party List A', imagePath: '/uploads/candidates/berido_alfredo.png' },
+    { name: 'Entino, Mary Grace', party: 'Party List B', imagePath: '/uploads/candidates/entino_mary_grace.png' },
   ],
   'Vice President': [
-    { name: 'Daming, Marina',  party: 'Party List A' },
-    { name: 'Kardante, Nilo',  party: 'Party List B' },
+    { name: 'Daming, Marina',  party: 'Party List A', imagePath: '/uploads/candidates/daming_marina.png' },
+    { name: 'Kardante, Nilo',  party: 'Party List B', imagePath: '/uploads/candidates/kardante_nilo.png' },
   ],
   'Secretary': [
-    { name: 'Galvez, Rey',      party: 'Party List A' },
-    { name: 'Jumao-As, Imelda', party: 'Party List B' },
+    { name: 'Galvez, Rey',      party: 'Party List A', imagePath: '/uploads/candidates/galvez_rey.png' },
+    { name: 'Jumao-As, Imelda', party: 'Party List B', imagePath: '/uploads/candidates/jumao_as_imelda.png' },
   ],
   'Treasurer': [
-    { name: 'Casero, Jimary',   party: 'Party List A' },
-    { name: 'Ligutan, Marissa', party: 'Party List B' },
+    { name: 'Casero, Jimary',   party: 'Party List A', imagePath: '/uploads/candidates/casero_jimary.png' },
+    { name: 'Ligutan, Marissa', party: 'Party List B', imagePath: '/uploads/candidates/ligutan_marissa.png' },
   ],
   'OIC Chairman': [
-    { name: 'Tugonon, Albert',  party: 'Party List A' },
-    { name: 'Barabad, Jocelyn', party: 'Party List B' },
+    { name: 'Tugonon, Albert',  party: 'Party List A', imagePath: '/uploads/candidates/tugonon_albert.png' },
+    { name: 'Barabad, Jocelyn', party: 'Party List B', imagePath: '/uploads/candidates/barabad_jocelyn.png' },
   ],
   'Members': [
-    { name: 'Manzano, Christopher', party: 'Party List A' },
-    { name: 'Laude, Benifredo',     party: 'Party List A' },
-    { name: 'Montezo, Cherry Fe',   party: 'Party List B' },
-    { name: 'Silod, Nilo',          party: 'Party List B' },
+    { name: 'Manzano, Christopher', party: 'Party List A', imagePath: '/uploads/candidates/manzano_christopher.png' },
+    { name: 'Laude, Benifredo',     party: 'Party List A', imagePath: '/uploads/candidates/laude_benifredo.png' },
+    { name: 'Montezo, Cherry Fe',   party: 'Party List B', imagePath: '/uploads/candidates/montezo_cherry_fe.png' },
+    { name: 'Silod, Nilo',          party: 'Party List B', imagePath: '/uploads/candidates/silod_nilo.png' },
   ],
 };
 

@@ -1,5 +1,10 @@
 import axiosInstance from '@/lib/axios'
 
+export async function getAllAdminCandidates() {
+  const res = await axiosInstance.get('/admin/candidates')
+  return res.data
+}
+
 export async function getCandidates(electionId, positionId) {
   const params = positionId ? { positionId } : {}
   const res = await axiosInstance.get(`/elections/${electionId}/candidates`, { params })

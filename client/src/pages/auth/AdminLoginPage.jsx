@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const { user, isLoading, login } = useAuth()
   const navigate = useNavigate()
 
@@ -26,13 +26,17 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    if (!form.voterId || !form.password) return setError('Voter ID and password are required.')
+    if (!form.voterId || !form.password) return setError('Username and password are required.')
     setIsSubmitting(true)
     try {
       const userData = await login(form)
-      navigate(userData.role === 'admin' ? '/admin/elections' : '/elections', { replace: true })
+      if (userData.role !== 'admin') {
+        setError('This account does not have admin access.')
+        return
+      }
+      navigate('/admin/elections', { replace: true })
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid voter ID or password.')
+      setError(err.response?.data?.message || 'Invalid username or password.')
     } finally {
       setIsSubmitting(false)
     }
@@ -45,14 +49,14 @@ export default function LoginPage() {
       <div className="w-full max-w-sm space-y-6">
         {/* Title */}
         <div className="text-center space-y-3">
-          <h1 className="text-3xl font-bold tracking-tight">CCF Ballota 2026</h1>
+          <h1 className="text-2xl font-bold">Admin Login</h1>
           <hr className="border-border" />
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium" htmlFor="voterId">Voter's ID</label>
+            <label className="text-sm font-medium" htmlFor="voterId">Username</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 <i className="bx bx-user text-base" />
@@ -65,7 +69,7 @@ export default function LoginPage() {
                 value={form.voterId}
                 onChange={handleChange}
                 className="w-full rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
-                placeholder="Enter your Voter's ID"
+                placeholder="Enter username"
               />
             </div>
           </div>
@@ -100,32 +104,18 @@ export default function LoginPage() {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <Button type="submit" className="w-full bg-foreground text-background hover:bg-foreground/90" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? 'Signing in…' : 'Sign In'}
+            {isSubmitting ? 'Signing in…' : 'Sign In as Admin'}
           </Button>
         </form>
 
-        {/* Divider */}
-        <div className="flex items-center gap-3">
-          <hr className="flex-1 border-border" />
-          <span className="text-xs text-muted-foreground">or</span>
-          <hr className="flex-1 border-border" />
-        </div>
-
-        {/* Admin Login */}
-        <Button
-          variant="outline"
-          className="w-full"
-          size="lg"
-          onClick={() => navigate('/admin-login')}
-        >
-          <i className="bx bx-shield-quarter mr-2 text-base" />
-          Admin Login
-        </Button>
-
-        {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground">
-          Authorized voters only. For assistance,<br />
-          contact your Purok 2 representative.
+        <p className="text-center text-sm text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="hover:text-foreground transition-colors"
+          >
+            ← Back to Voter Login
+          </button>
         </p>
       </div>
     </div>

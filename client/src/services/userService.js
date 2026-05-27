@@ -15,8 +15,18 @@ export async function changePassword(data) {
   return res.data
 }
 
+export async function createAdminUser(data) {
+  const res = await axiosInstance.post('/admin/users', data)
+  return res.data
+}
+
 export async function getAdminUsers(page = 1, limit = 20) {
   const res = await axiosInstance.get('/admin/users', { params: { page, limit } })
+  return res.data
+}
+
+export async function updateAdminUser(id, data) {
+  const res = await axiosInstance.put(`/admin/users/${id}`, data)
   return res.data
 }
 

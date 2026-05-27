@@ -8,7 +8,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    const publicPaths = ['/login', '/register']
+    const publicPaths = ['/login', '/admin-login']
     if (error.response?.status === 401 && !publicPaths.includes(window.location.pathname)) {
       window.location.href = '/login'
     }

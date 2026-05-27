@@ -9,6 +9,20 @@ const { requireAdmin } = require('../../middleware/auth');
 
 router.use(requireAdmin);
 
+// GET all candidates across all elections, with election + position names
+router.get('/', async (req, res, next) => {
+  try {
+    const candidates = await Candidate
+      .find()
+      .populate('electionId', 'title status')
+      .populate('positionId', 'name')
+      .sort({ createdAt: -1 });
+    res.json(candidates);
+  } catch (err) {
+    next(err);
+  }
+});
+
 function handleUpload(req, res, next) {
   upload.single('image')(req, res, (err) => {
     if (!err) return next();
@@ -40,7 +54,7 @@ router.post('/', handleUpload, async (req, res, next) => {
       return res.status(400).json({ message: 'Position does not belong to this election.' });
     }
 
-    const candidate = await Candidate.create({
+    const created = await Candidate.create({
       electionId,
       positionId,
       name: name.trim(),
@@ -48,6 +62,10 @@ router.post('/', handleUpload, async (req, res, next) => {
       platform: platform?.trim() || '',
       imagePath: req.file ? `/uploads/candidates/${req.file.filename}` : null,
     });
+
+    const candidate = await Candidate.findById(created._id)
+      .populate('electionId', 'title status')
+      .populate('positionId', 'name');
 
     res.status(201).json(candidate);
   } catch (err) {
@@ -78,6 +96,8 @@ router.put('/:id', handleUpload, async (req, res, next) => {
     }
 
     await candidate.save();
+    await candidate.populate('electionId', 'title status');
+    await candidate.populate('positionId', 'name');
     res.json(candidate);
   } catch (err) {
     cleanupFile(req.file);
