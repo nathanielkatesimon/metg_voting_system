@@ -1,10 +1,110 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { getAdminUsers, createAdminUser, updateAdminUser, deleteAdminUser } from '@/services/userService'
+import { getAdminUsers, createAdminUser, updateAdminUser, deleteAdminUser, importAdminUsers } from '@/services/userService'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 import { showSuccess, showError } from '@/lib/toast'
+
+function CsvImportModal({ onDone, onClose }) {
+  const fileRef = useRef(null)
+  const [file, setFile] = useState(null)
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
+  const [isUploading, setIsUploading] = useState(false)
+
+  async function handleUpload() {
+    if (!file) return setError('Please select a CSV file.')
+    setError('')
+    setIsUploading(true)
+    try {
+      const data = await importAdminUsers(file)
+      setResult(data)
+      if (data.created > 0) onDone()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Import failed.')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="bg-background rounded-xl border border-border shadow-lg p-6 w-full max-w-md space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold">Import Voters via CSV</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            <i className="bx bx-x text-xl" />
+          </button>
+        </div>
+
+        {!result ? (
+          <>
+            <p className="text-sm text-muted-foreground">
+              Upload a CSV with columns: <code className="bg-muted px-1 rounded text-xs">fullName</code>,{' '}
+              <code className="bg-muted px-1 rounded text-xs">voterId</code>,{' '}
+              <code className="bg-muted px-1 rounded text-xs">password</code>. Existing voter IDs are skipped.
+            </p>
+            <div
+              onClick={() => fileRef.current?.click()}
+              className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/60 hover:bg-muted/40 transition-colors"
+            >
+              <i className="bx bx-upload text-2xl text-muted-foreground" />
+              <p className="text-sm mt-1 text-muted-foreground">
+                {file ? file.name : 'Click to choose a .csv file'}
+              </p>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={e => { setFile(e.target.files[0] || null); setError('') }}
+              />
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <div className="flex gap-2 justify-end pt-1">
+              <Button type="button" variant="outline" onClick={onClose} disabled={isUploading}>Cancel</Button>
+              <Button onClick={handleUpload} disabled={!file || isUploading}>
+                {isUploading ? 'Importing…' : 'Import'}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="space-y-3">
+            <div className="space-y-1.5 text-sm">
+              <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                <i className="bx bx-check-circle text-base" />
+                <span>{result.created} voter{result.created !== 1 ? 's' : ''} created</span>
+              </div>
+              {result.skipped > 0 && (
+                <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
+                  <i className="bx bx-skip-next text-base" />
+                  <span>{result.skipped} row{result.skipped !== 1 ? 's' : ''} skipped (duplicate Voter ID)</span>
+                </div>
+              )}
+              {result.errors.length > 0 && (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-destructive">
+                    <i className="bx bx-error-circle text-base" />
+                    <span>{result.errors.length} row{result.errors.length !== 1 ? 's' : ''} failed validation</span>
+                  </div>
+                  <ul className="ml-5 space-y-0.5 text-xs text-muted-foreground list-disc">
+                    {result.errors.map((e, i) => (
+                      <li key={i}>Row {e.row}: {e.reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end pt-1">
+              <Button onClick={onClose}>Done</Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 function VoterFormModal({ voter, onSuccess, onClose }) {
   const isEdit = Boolean(voter)
@@ -116,6 +216,7 @@ export default function UsersPage() {
   const [editModal, setEditModal] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [importModal, setImportModal] = useState(false)
 
   useEffect(() => { fetchUsers(page) }, [page])
 
@@ -185,9 +286,14 @@ export default function UsersPage() {
           <p className="text-sm text-muted-foreground mt-0.5">{titles[mode].sub}</p>
         </div>
         {mode === 'add' && (
-          <Button onClick={() => setAddModal(true)}>
-            <i className="bx bx-plus mr-1 text-base" /> Add Voter
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportModal(true)}>
+              <i className="bx bx-import mr-1 text-base" /> Import CSV
+            </Button>
+            <Button onClick={() => setAddModal(true)}>
+              <i className="bx bx-plus mr-1 text-base" /> Add Voter
+            </Button>
+          </div>
         )}
       </div>
 
@@ -302,6 +408,12 @@ export default function UsersPage() {
         </>
       )}
 
+      {importModal && (
+        <CsvImportModal
+          onDone={() => { fetchUsers(1); setPage(1) }}
+          onClose={() => setImportModal(false)}
+        />
+      )}
       {addModal && <VoterFormModal onSuccess={handleSaved} onClose={closeAddModal} />}
       {editModal && <VoterFormModal voter={editModal} onSuccess={handleSaved} onClose={() => setEditModal(null)} />}
 

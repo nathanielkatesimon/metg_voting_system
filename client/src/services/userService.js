@@ -34,3 +34,10 @@ export async function deleteAdminUser(id) {
   const res = await axiosInstance.delete(`/admin/users/${id}`)
   return res.data
 }
+
+export async function importAdminUsers(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  const res = await axiosInstance.post('/admin/users/import', formData)
+  return res.data
+}

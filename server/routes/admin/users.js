@@ -1,10 +1,77 @@
 const express = require('express');
+const multer = require('multer');
+const { Readable } = require('stream');
+const csvParser = require('csv-parser');
 const User = require('../../models/User');
 const { requireAdmin } = require('../../middleware/auth');
 
 const router = express.Router();
 
 router.use(requireAdmin);
+
+const csvUpload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'text/csv' || file.originalname.toLowerCase().endsWith('.csv')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only CSV files are allowed.'));
+    }
+  },
+  limits: { fileSize: 1 * 1024 * 1024 },
+});
+
+// POST /api/admin/users/import — bulk import voters from CSV
+router.post('/import', csvUpload.single('file'), async (req, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No CSV file uploaded.' });
+
+    const rows = await new Promise((resolve, reject) => {
+      const results = [];
+      Readable.from(req.file.buffer)
+        .pipe(csvParser({ mapHeaders: ({ header }) => header.trim().toLowerCase() }))
+        .on('data', row => results.push(row))
+        .on('end', () => resolve(results))
+        .on('error', reject);
+    });
+
+    if (rows.length === 0) return res.status(400).json({ message: 'CSV file is empty.' });
+
+    let created = 0;
+    let skipped = 0;
+    const errors = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const rowNum = i + 2; // 1-based + header row
+      const row = rows[i];
+      const fullName = row.fullname?.trim();
+      const voterId = row.voterid?.trim();
+      const password = row.password?.trim();
+
+      if (!fullName || !voterId || !password) {
+        errors.push({ row: rowNum, reason: 'fullName, voterId, and password are required.' });
+        continue;
+      }
+      if (password.length < 8) {
+        errors.push({ row: rowNum, reason: 'Password must be at least 8 characters.' });
+        continue;
+      }
+
+      const existing = await User.findOne({ voterId });
+      if (existing) {
+        skipped++;
+        continue;
+      }
+
+      await User.create({ fullName, voterId, password, role: 'voter' });
+      created++;
+    }
+
+    res.json({ created, skipped, errors });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // POST /api/admin/users — create a new voter account
 router.post('/', async (req, res, next) => {
