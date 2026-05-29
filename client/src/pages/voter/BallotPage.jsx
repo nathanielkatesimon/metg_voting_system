@@ -6,6 +6,7 @@ import { getCandidates } from '@/services/candidateService'
 import { getMyVotes } from '@/services/voteService'
 import BallotPosition from '@/components/voting/BallotPosition'
 import BallotConfirmDialog from '@/components/voting/BallotConfirmDialog'
+import VoteSuccessModal from '@/components/voting/VoteSuccessModal'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/button'
 
@@ -19,6 +20,8 @@ export default function BallotPage() {
   // selections: { [positionId]: Set<candidateId> }
   const [selections, setSelections] = useState({})
   const [showConfirm, setShowConfirm] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [lastCommitted, setLastCommitted] = useState({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -87,6 +90,8 @@ export default function BallotPage() {
       return next
     })
     setShowConfirm(false)
+    setLastCommitted(committed)
+    setShowSuccess(true)
   }
 
   const hasAnySelection = Object.values(selections).some(s => s.size > 0)
@@ -160,6 +165,15 @@ export default function BallotPage() {
           selections={selections}
           onSuccess={handleVotesCommitted}
           onClose={() => setShowConfirm(false)}
+        />
+      )}
+
+      {showSuccess && (
+        <VoteSuccessModal
+          committed={lastCommitted}
+          positions={positions}
+          candidatesByPosition={candidatesByPosition}
+          onClose={() => setShowSuccess(false)}
         />
       )}
     </div>
